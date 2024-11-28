@@ -1,4 +1,5 @@
 # Set up the prompt
+# test
 autoload -Uz promptinit
 promptinit
 prompt suse
