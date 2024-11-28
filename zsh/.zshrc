@@ -75,8 +75,8 @@ setopt  autocd autopushd
 
 # add to PATH
 export PATH="/home/marco/.local/bin:$PATH"
-export PATH="/opt/gmsh-git-Linux64/bin/:$PATH"
-. /opt/openfoam10/etc/bashrc
+#export PATH="/opt/gmsh-git-Linux64/bin/:$PATH"
+#. /opt/openfoam10/etc/bashrc
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
 
 export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
