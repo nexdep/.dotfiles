@@ -119,9 +119,3 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Source all configuration files in ~/.bash
-if [ -d "$HOME/.bash" ]; then
-    for file in "$HOME/.bash"/*; do
-        [ -r "$file" ] && source "$file"
-    done
-fi
