@@ -5,6 +5,8 @@ promptinit
 prompt suse
 setopt histignorealldups sharehistory
 
+# help with spelling
+setopt CORRECT
 
 #silence bell
 unsetopt BEEP
@@ -74,7 +76,7 @@ chpwd (){ ls -alF; }
 setopt  autocd autopushd 
 
 # add to PATH
-export PATH="/home/marco/.local/bin:$PATH"
+#export PATH="/home/marco/.local/bin:$PATH"
 #export PATH="/opt/gmsh-git-Linux64/bin/:$PATH"
 #. /opt/openfoam10/etc/bashrc
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
@@ -121,5 +123,9 @@ function showpath() {
     fi
 }
 # function to print the path in a sorted manner >> end
+
+#zoxide part
+eval "$(zoxide init zsh)"
+alias cd="z"
 
 export DISPLAY=:0.0
