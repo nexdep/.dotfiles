@@ -91,6 +91,14 @@ source /usr/share/doc/fzf/examples/completion.zsh
 export VISUAL=vim
 export EDITOR=vim
 
+# function to simplify the upload of simple repos >> start
+acp() {
+    git add -A
+    git commit -m "$1"
+    git push origin main
+}
+# function to simplify the upload of simple repos << end
+
 # function to print the path in a sorted manner >> start
 function showpath() {
     local SORT_FLAG=0
