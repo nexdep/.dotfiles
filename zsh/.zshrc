@@ -6,6 +6,7 @@ setopt histignorealldups sharehistory
 
 # help with spelling
 setopt CORRECT
+setopt null_glob
 
 #silence bell
 unsetopt BEEP
