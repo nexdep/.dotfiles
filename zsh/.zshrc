@@ -76,6 +76,7 @@ setopt  autocd autopushd
 
 # add to PATH
 export PATH="/home/marco/.local/bin:$PATH"
+export PATH="/home/root/.local/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
 
 export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
