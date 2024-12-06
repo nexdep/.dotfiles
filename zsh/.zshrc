@@ -60,14 +60,6 @@ alias vi="\vim"
 alias start='cmd.exe /c start  '
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
-alias gtfo="rg \
---color=always --line-number --no-heading \
---smart-case '' $FOAM_TUTORIALS |
-fzf --ansi \
---color 'hl:-1:underline,hl+:-1:underline:reverse' \
---delimiter : \
---preview 'batcat -lcpp {1} --highlight-line {2}' \
---preview-window 'up,75%,border,+{2}+3/3,~3'"
 
 # Show contents of the directory after changing to it
 chpwd (){ ls -alF; }
