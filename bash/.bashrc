@@ -122,4 +122,5 @@ fi
 # add to PATH
 export PATH="/home/marco/.local/bin:$PATH"
 export PATH="/home/root/.local/bin:$PATH"
+export PATH="/opt/nvim-linux64/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
