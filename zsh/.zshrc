@@ -93,7 +93,10 @@ acp() {
 
 # function to print the path in a sorted manner >> start
 # Use: showpath [VAR_NAME] [-s|--sort]
-# Defaults to "PATH" if no variable name is provided
+# Defaults to "PATH" if no variable name is provided.
+# - If VAR_NAME is an array (e.g. fpath), it prints each element on its own line.
+# - Otherwise (e.g. PATH), it splits on ":" and prints each entry on its own line.
+# - The -s or --sort flag sorts the output.
 function showpath() {
     local SORT_FLAG=0
     local varName="PATH"
@@ -116,24 +119,23 @@ function showpath() {
         esac
     done
 
-    # Get the actual content of the chosen variable
-    local varContent=${(P)varName}  # Zsh 'parameter expansion' to get $PATH, $fpath, etc.
+    # Retrieve variable content
+    local varContent=${(P)varName}
+    local -a paths
 
-    # Convert colon-separated paths to lines, preserving any paths with colons in them
-    local PATH_OUTPUT
-    PATH_OUTPUT=$(
-        echo "$varContent" \
-        | sed -e 's/:\([^/]\)/@COLON@\1/g' \
-              -e 's/:/\n/g' \
-              -e 's/@COLON@/:/g' \
-              -e 's/:/ /g'
-    )
-
-    # If sort flag is on, sort the lines
-    if [[ $SORT_FLAG -eq 1 ]]; then
-        echo "$PATH_OUTPUT" | sort
+    # If it's an array type (e.g. fpath), just read it as an array
+    # Otherwise, assume it's colon-separated (e.g. PATH)
+    if [[ ${(t)varName} == *array* ]]; then
+        paths=( ${(P)varName} )
     else
-        echo "$PATH_OUTPUT"
+        IFS=: read -rA paths <<< "$varContent"
+    fi
+
+    # Sort if requested
+    if (( SORT_FLAG )); then
+        printf '%s\n' "${paths[@]}" | sort
+    else
+        printf '%s\n' "${paths[@]}"
     fi
 }
 # function to print the path in a sorted manner >> end
