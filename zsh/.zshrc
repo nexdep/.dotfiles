@@ -92,11 +92,12 @@ acp() {
 # function to simplify the upload of simple repos << end
 
 # function to print the path in a sorted manner >> start
-# Use: showpath [VAR_NAME] [-s|--sort]
-# - Defaults to "PATH" if no variable name is provided.
-# - If VAR_NAME is an array (e.g., fpath), each element is printed on its own line.
-# - Otherwise (e.g., PATH), it splits on ":" and prints each entry on its own line.
-# - The -s or --sort flag sorts the output.
+# Usage: showpath [VAR_NAME] [-s|--sort]
+# - Defaults to "PATH" if no variable name is given.
+# - If VAR_NAME is an array (e.g. fpath), each element is printed on its own line.
+# - If VAR_NAME is colon-separated (e.g. PATH), each : delimited entry is printed on its own line.
+# - If VAR_NAME is space-delimited (sometimes fpath is set this way), splits on whitespace.
+# - -s or --sort sorts the output.
 function showpath() {
     local SORT_FLAG=0
     local varName="PATH"
@@ -119,15 +120,22 @@ function showpath() {
         esac
     done
 
-    # If the variable is an array (like fpath), read it directly.
-    # Otherwise, assume it's a colon-separated string (like PATH).
+    local rawValue=${(P)varName}   # Raw contents of the variable
     local -a paths
+
+    # 1) Check if it's truly an array (the user declared 'typeset -a varName' or 'varName=(...)')
     if [[ ${(t)varName} == *array* ]]; then
-        # Array variable (e.g., fpath)
+        # Expanding a real array
         paths=( ${(P)varName} )
     else
-        # Colon-separated variable (e.g., PATH)
-        IFS=: read -rA paths <<< "${(P)varName}"
+        # 2) If it's not flagged as an array, we guess how it's separated
+        if [[ "$rawValue" == *:* ]]; then
+            # Colon-separated (like PATH)
+            paths=( ${(s/:/)rawValue} )
+        else
+            # Space-delimited (e.g. fpath="/usr/share/zsh/... /usr/local/share/...") 
+            paths=( ${(s/ /)rawValue} )
+        fi
     fi
 
     # Sort if requested
