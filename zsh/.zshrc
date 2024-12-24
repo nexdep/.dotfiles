@@ -92,30 +92,44 @@ acp() {
 # function to simplify the upload of simple repos << end
 
 # function to print the path in a sorted manner >> start
+# Use: showpath [VAR_NAME] [-s|--sort]
+# Defaults to "PATH" if no variable name is provided
 function showpath() {
     local SORT_FLAG=0
+    local varName="PATH"
 
-    # Process options
+    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -s|--sort)
                 SORT_FLAG=1
                 shift
                 ;;
-            *)
-                echo "Usage: showpath [-s|--sort]"
+            -*)
+                echo "Usage: showpath [VAR_NAME] [-s|--sort]"
                 return 1
+                ;;
+            *)
+                varName="$1"
+                shift
                 ;;
         esac
     done
 
-    # Process the PATH variable
-    local PATH_OUTPUT
-    PATH_OUTPUT=$(echo "$PATH" | sed -e 's/:\([^/]\)/@COLON@\1/g' \
-                                     -e 's/:/\n/g' \
-                                     -e 's/@COLON@/:/g' \
-                                     -e 's/:/ /g')
+    # Get the actual content of the chosen variable
+    local varContent=${(P)varName}  # Zsh 'parameter expansion' to get $PATH, $fpath, etc.
 
+    # Convert colon-separated paths to lines, preserving any paths with colons in them
+    local PATH_OUTPUT
+    PATH_OUTPUT=$(
+        echo "$varContent" \
+        | sed -e 's/:\([^/]\)/@COLON@\1/g' \
+              -e 's/:/\n/g' \
+              -e 's/@COLON@/:/g' \
+              -e 's/:/ /g'
+    )
+
+    # If sort flag is on, sort the lines
     if [[ $SORT_FLAG -eq 1 ]]; then
         echo "$PATH_OUTPUT" | sort
     else
