@@ -93,9 +93,9 @@ acp() {
 
 # function to print the path in a sorted manner >> start
 # Use: showpath [VAR_NAME] [-s|--sort]
-# Defaults to "PATH" if no variable name is provided.
-# - If VAR_NAME is an array (e.g. fpath), it prints each element on its own line.
-# - Otherwise (e.g. PATH), it splits on ":" and prints each entry on its own line.
+# - Defaults to "PATH" if no variable name is provided.
+# - If VAR_NAME is an array (e.g., fpath), each element is printed on its own line.
+# - Otherwise (e.g., PATH), it splits on ":" and prints each entry on its own line.
 # - The -s or --sort flag sorts the output.
 function showpath() {
     local SORT_FLAG=0
@@ -119,16 +119,15 @@ function showpath() {
         esac
     done
 
-    # Retrieve variable content
-    local varContent=${(P)varName}
+    # If the variable is an array (like fpath), read it directly.
+    # Otherwise, assume it's a colon-separated string (like PATH).
     local -a paths
-
-    # If it's an array type (e.g. fpath), just read it as an array
-    # Otherwise, assume it's colon-separated (e.g. PATH)
     if [[ ${(t)varName} == *array* ]]; then
+        # Array variable (e.g., fpath)
         paths=( ${(P)varName} )
     else
-        IFS=: read -rA paths <<< "$varContent"
+        # Colon-separated variable (e.g., PATH)
+        IFS=: read -rA paths <<< "${(P)varName}"
     fi
 
     # Sort if requested
