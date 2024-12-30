@@ -151,4 +151,7 @@ function showpath() {
 eval "$(zoxide init zsh)"
 alias cd="z"
 
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
 export DISPLAY=:0.0
