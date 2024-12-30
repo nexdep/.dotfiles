@@ -76,9 +76,6 @@ export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$P
 export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
 export WORKF="/mnt/c/Users/marco/OneDrive - UNED/01_WORK/"
 
-source /usr/share/doc/fzf/examples/key-bindings.zsh
-source /usr/share/doc/fzf/examples/completion.zsh
-
 # use vim keybindings in less
 export VISUAL=vim
 export EDITOR=vim
@@ -155,3 +152,5 @@ alias cd="z"
 source <(fzf --zsh)
 
 export DISPLAY=:0.0
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
