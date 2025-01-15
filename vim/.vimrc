@@ -1,7 +1,10 @@
 "MDP configuration file for VIM - wsl
 
 "fix a color bug in wsl
-"highlight Normal ctermfg=black ctermbg=white
+highlight Visual    ctermfg=NONE  ctermbg=grey guifg=NONE  guibg=grey
+highlight Search    ctermfg=black ctermbg=grey guifg=black guibg=grey
+highlight IncSearch ctermfg=black ctermbg=grey guifg=black guibg=grey
+
 
 "silence the vim bell
 set noerrorbells
