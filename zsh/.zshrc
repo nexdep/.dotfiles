@@ -147,6 +147,9 @@ function showpath() {
 eval "$(zoxide init zsh)"
 alias cd="z"
 
+# starship
+eval "$(starship init zsh)"
+
 # Set up fzf key bindings and fuzzy completion
 source <(fzf --zsh)
 
