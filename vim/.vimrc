@@ -5,6 +5,9 @@ highlight Visual    ctermfg=NONE  ctermbg=grey guifg=NONE  guibg=grey
 highlight Search    ctermfg=black ctermbg=grey guifg=black guibg=grey
 highlight IncSearch ctermfg=black ctermbg=grey guifg=black guibg=grey
 
+" send to windows clipboard
+set clipboard=unnamedplus
+
 
 "silence the vim bell
 set noerrorbells
@@ -24,7 +27,8 @@ augroup QuickNotes
 augroup END
 
 
-" F3 key mapping for results redirect  https://vim.fandom.com/wiki/Redirect_g_search_output
+" F3 key mapping for results redirect  
+" https://vim.fandom.com/wiki/Redirect_g_search_output
 nnoremap <silent> <F3> :redir @a<CR>:g//<CR>:redir END<CR>:new<CR>:put! a<CR>
 
 " F9 remap for running python code while editing
@@ -32,7 +36,7 @@ autocmd FileType python map <buffer> <F9> :w<CR>:exec '!python3' shellescape(@%,
 autocmd FileType python imap <buffer> <F9> <esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
 
 "set a light grey bar on the 80th column
-highlight ColorColumn ctermbg=lightgrey guibg=lightgrey  
+highlight ColorColumn ctermbg=grey guibg=grey  
 set cc=80
 
 
