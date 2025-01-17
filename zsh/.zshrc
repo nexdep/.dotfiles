@@ -175,6 +175,7 @@ function y() {
 }
 # function end
 
+
 #zoxide part
 eval "$(zoxide init zsh)"
 alias cd="z"
