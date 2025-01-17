@@ -3,11 +3,11 @@ autoload -Uz promptinit
 promptinit
 prompt suse
 setopt histignorealldups sharehistory
-
+ 
 # help with spelling
 setopt CORRECT
 setopt null_glob
-
+ 
 #silence bell
 unsetopt BEEP
 
@@ -15,13 +15,28 @@ unsetopt BEEP
 HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zsh_history
-
+ 
 # Use modern completion system
 autoload -Uz compinit
-compinit
-
+if ! type compinit &>/dev/null; then
+  compinit
+fi
+ 
+ 
+ 
+# Define a custom completer function
+_my_number_completer() {
+  if [[ $LBUFFER =~ '[0-9]$' ]]; then
+    _files -/
+  else
+    _complete
+  fi
+}
+ 
+ 
 zstyle ':completion:*' auto-description 'specify: %d'
-zstyle ':completion:*' completer _expand _complete _correct _approximate
+#zstyle ':completion:*' completer _my_number_completer _expand _complete _correct _approximate
+zstyle ':completion:*' completer _my_number_completer _complete
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' menu select=2
@@ -183,7 +198,7 @@ alias cd="z"
 # starship
 eval "$(starship init zsh)"
 
-# Set up fzf key bindings and fuzzy completion
+#Set up fzf key bindings and fuzzy completion
 source <(fzf --zsh)
 
 export DISPLAY=:0.0
