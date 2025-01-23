@@ -8,6 +8,19 @@ highlight IncSearch ctermfg=black ctermbg=grey guifg=black guibg=grey
 " send to windows clipboard
 set clipboard=unnamedplus
 
+"Mode Settings
+let &t_SI.="\e[2 q" "SI = INSERT mode
+let &t_SR.="\e[4 q" "SR = REPLACE mode
+let &t_EI.="\e[2 q" "EI = NORMAL mode (ELSE)
+
+"Cursor settings:
+"  1 -> blinking block
+"  2 -> solid block 
+"  3 -> blinking underscore
+"  4 -> solid underscore
+"  5 -> blinking vertical bar
+"  6 -> solid vertical bar
+
 
 "silence the vim bell
 set noerrorbells
