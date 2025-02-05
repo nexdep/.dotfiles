@@ -64,7 +64,7 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 #ALIASES
-alias ll='ls -AhlF'
+alias ll='eza -ahlF --git --git-repos'
 alias la='ls -A'
 alias l='ls -CF'
 alias explorer="explorer.exe "
@@ -74,7 +74,7 @@ alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
 # Show contents of the directory after changing to it
-chpwd (){ eza -la -h --git --git-repos; }
+chpwd (){ eza -ahlF  --git --git-repos; }
 
 # navigation options
 setopt  autocd autopushd 
@@ -82,7 +82,7 @@ setopt  autocd autopushd
 # add to PATH
 export PATH="/home/marco/.local/bin:$PATH"
 export PATH="/home/root/.local/bin:$PATH"
-export PATH="/opt/nvim-linux64/bin:$PATH"
+export PATH="/opt/nvim/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
 
 export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
