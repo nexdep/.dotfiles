@@ -57,8 +57,6 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
 
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -76,7 +74,7 @@ alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
 # Show contents of the directory after changing to it
-chpwd (){ ls -alF; }
+chpwd (){ eza -la -h --git --git-repos; }
 
 # navigation options
 setopt  autocd autopushd 
