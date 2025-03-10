@@ -7,6 +7,7 @@ highlight IncSearch ctermfg=black ctermbg=grey guifg=black guibg=grey
 
 " send to windows clipboard
 set clipboard=unnamedplus
+set nowrap
 
 "Mode Settings
 let &t_SI.="\e[2 q" "SI = INSERT mode
