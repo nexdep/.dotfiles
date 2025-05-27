@@ -70,6 +70,7 @@ alias l='ls -CF'
 alias explorer="explorer.exe "
 alias clip="clip.exe "
 alias start='cmd.exe /c start  '
+alias ...='cd ../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
@@ -99,6 +100,12 @@ acp() {
     git push origin main
 }
 # function to simplify the upload of simple repos << end
+
+# function to create and enter a folder >> start
+mkcd() {
+  mkdir -p -- "$1" && cd -- "$1"
+}
+# function to create and enter a folder << end
 
 # function to print the path in a sorted manner >> start
 # Usage: showpath [VAR_NAME] [-s|--sort]
@@ -220,3 +227,4 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+# end
