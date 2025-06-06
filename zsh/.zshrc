@@ -81,7 +81,6 @@ chpwd (){ eza -ahlF  --git --git-repos; }
 setopt  autocd autopushd 
 
 # add to PATH
-export PATH="/home/marco/.local/bin:$PATH"
 export PATH="/home/root/.local/bin:$PATH"
 export PATH="/opt/nvim/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
@@ -231,4 +230,4 @@ unset __conda_setup
 
 source /opt/openfoam12/etc/bashrc
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH:$HOME/.local/bin"

@@ -7,14 +7,12 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
-
 -- Write buffer whenever focus is lost or leaving insert mode
-vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
-  pattern = "*",
-  callback = function()
-    if vim.bo.modifiable and vim.bo.filetype ~= "gitcommit" then
-      vim.cmd("silent! update")
-    end
-  end,
-})
-
+-- vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
+--   pattern = "*",
+--   callback = function()
+--     if vim.bo.modifiable and vim.bo.filetype ~= "gitcommit" then
+--       vim.cmd("silent! update")
+--     end
+--   end,
+-- })
