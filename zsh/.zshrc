@@ -11,6 +11,9 @@ setopt null_glob
 #silence bell
 unsetopt BEEP
 
+# vim  mode - enter by pressing Esc
+setopt vi
+
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=1000
 SAVEHIST=1000
@@ -195,9 +198,6 @@ function y() {
 # function end
 
 
-#zoxide part
-eval "$(zoxide init zsh)"
-alias cd="z"
 
 # starship
 eval "$(starship init zsh)"
@@ -231,3 +231,7 @@ unset __conda_setup
 source /opt/openfoam12/etc/bashrc
 
 export PATH="$PATH:$HOME/.local/bin"
+
+#zoxide part
+eval "$(zoxide init zsh)"
+alias cd="z"
