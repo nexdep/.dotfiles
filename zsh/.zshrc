@@ -74,6 +74,7 @@ alias explorer="explorer.exe "
 alias clip="clip.exe "
 alias start='cmd.exe /c start  '
 alias ...='cd ../..'
+alias ....='cd ../../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
