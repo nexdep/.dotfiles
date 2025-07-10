@@ -97,9 +97,12 @@ export EDITOR=vim
 
 # function to simplify the upload of simple repos >> start
 acp() {
-    git add -A
-    git commit -m "$1"
-    git push origin main
+  # require a commit message
+  [ $# -eq 0 ] && { echo "Usage: acp <commit-message>"; return 1; }
+
+  git add -A                       # stage all changes
+  git commit -m "$*"               # commit with the given message
+  git push -u origin HEAD          # push to the branch you’re currently on
 }
 # function to simplify the upload of simple repos << end
 
