@@ -14,10 +14,49 @@ unsetopt BEEP
 # vim  mode - enter by pressing Esc
 setopt vi
 
-# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
-HISTSIZE=1000
-SAVEHIST=1000
-HISTFILE=~/.zsh_history
+
+##########
+# HISTORY
+##########
+
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+HISTDUP=erase
+
+# 
+setopt APPEND_HISTORY
+
+# Immediately append to history file:
+setopt INC_APPEND_HISTORY
+
+# Record timestamp in history:
+setopt EXTENDED_HISTORY
+
+# Expire duplicate entries first when trimming history:
+setopt HIST_EXPIRE_DUPS_FIRST
+
+# Dont record an entry that was just recorded again:
+setopt HIST_IGNORE_DUPS
+
+# Delete old recorded entry if new entry is a duplicate:
+setopt HIST_IGNORE_ALL_DUPS
+
+# Do not display a line previously found:
+setopt HIST_FIND_NO_DUPS
+
+# Dont record an entry starting with a space:
+setopt HIST_IGNORE_SPACE
+
+# Dont write duplicate entries in the history file:
+setopt HIST_SAVE_NO_DUPS
+
+# Share history between all sessions:
+setopt SHARE_HISTORY
+
+##########
+# HISTORY END
+##########
  
 # Use modern completion system
 autoload -Uz compinit
@@ -38,7 +77,6 @@ _my_number_completer() {
  
  
 zstyle ':completion:*' auto-description 'specify: %d'
-#zstyle ':completion:*' completer _my_number_completer _expand _complete _correct _approximate
 zstyle ':completion:*' completer _my_number_completer _complete
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
@@ -77,6 +115,11 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
+
+# gomi alias for removing files
+if command -v gomi >/dev/null 2>&1; then
+  alias gm='gomi'
+fi
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
@@ -232,7 +275,6 @@ unset __conda_setup
 
 # end
 
-source /opt/openfoam12/etc/bashrc
 
 export PATH="$PATH:$HOME/.local/bin"
 

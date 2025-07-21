@@ -49,9 +49,9 @@ nnoremap <silent> <F3> :redir @a<CR>:g//<CR>:redir END<CR>:new<CR>:put! a<CR>
 autocmd FileType python map <buffer> <F9> :w<CR>:exec '!python3' shellescape(@%, 1)<CR>
 autocmd FileType python imap <buffer> <F9> <esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
 
-"set a light grey bar on the 80th column
-highlight ColorColumn ctermbg=grey guibg=grey  
-set cc=80
+" set a light grey bar on the 80th column
+"highlight ColorColumn ctermbg=grey guibg=grey  
+"set cc=80
 
 
 "remap to avoid arrows!
