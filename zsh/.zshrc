@@ -156,6 +156,13 @@ mkcd() {
 }
 # function to create and enter a folder << end
 
+# function to send the tmux scrollback to neovim >> start
+scroll() {
+    nvim <(tmux capture-pane -pS - -J \
+	               | sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba')
+}
+# function to send the tmux scrollback to neovim >> end
+
 # function to print the path in a sorted manner >> start
 # Usage: showpath [VAR_NAME] [-s|--sort]
 # - Defaults to "PATH" if no variable name is given.
@@ -282,13 +289,3 @@ export PATH="$PATH:$HOME/.local/bin"
 eval "$(zoxide init zsh)"
 alias cd="z"
 
-## TMUX PART BEGIN
-# Only proceed in an interactive shell
-[[ $- != *i* ]] && return
-
-# If tmux is installed and we're not already inside one, attach or create
-if command -v tmux > /dev/null 2>&1 && [ -z "$TMUX" ]; then
-  # Try to attach to a session named “main”, or create it if none exists
-  exec tmux new-session -A -s main
-fi
-## TMUX PART END
