@@ -281,3 +281,14 @@ export PATH="$PATH:$HOME/.local/bin"
 #zoxide part
 eval "$(zoxide init zsh)"
 alias cd="z"
+
+## TMUX PART BEGIN
+# Only proceed in an interactive shell
+[[ $- != *i* ]] && return
+
+# If tmux is installed and we're not already inside one, attach or create
+if command -v tmux > /dev/null 2>&1 && [ -z "$TMUX" ]; then
+  # Try to attach to a session named “main”, or create it if none exists
+  exec tmux new-session -A -s main
+fi
+## TMUX PART END
