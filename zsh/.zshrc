@@ -108,7 +108,6 @@ fi
 alias ll='eza -ahlF --git --git-repos'
 alias la='ls -A'
 alias l='ls -CF'
-alias explorer="explorer.exe "
 alias clip="clip.exe "
 alias start='cmd.exe /c start  '
 alias ...='cd ../..'
@@ -123,6 +122,13 @@ fi
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
+
+# Show contents of the directory after changing to it
+explorer() {
+  local target="${1:-.}"             # default to current dir
+  /mnt/c/Windows/explorer.exe "$(wslpath -w "$target")"
+}
+
 
 # navigation options
 setopt  autocd autopushd 
@@ -289,3 +295,7 @@ export PATH="$PATH:$HOME/.local/bin"
 eval "$(zoxide init zsh)"
 alias cd="z"
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

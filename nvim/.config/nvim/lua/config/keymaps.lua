@@ -2,11 +2,43 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
--- Tell % to also match quotes
-vim.opt.matchpairs:append({ ['"'] = '"', ["'"] = "'" })
+-- in insert mode, Ctrl+Right to jump forward by one word
+vim.keymap.set("i", "<C-l>", "<C-o>e", {
+  noremap = true,
+  silent = true,
+  desc = "Insert: next word",
+})
 
--- In Insert mode, press <C-]> to do: Normal %, then go back to Insert
--- Combo to skip outside of brackets and quotes in insert mode
-vim.keymap.set("i", "<C-]>", [[<C-c>%%a]], { silent = true })
-vim.keymap.set("i", "<C-l>", [[<C-c>wa]], { silent = true })
-vim.keymap.set("i", "<C-h>", [[<C-c>bi]], { silent = true })
+-- in insert mode, Ctrl+Left to jump backward by one word
+vim.keymap.set("i", "<C-h>", "<C-o>b", {
+  noremap = true,
+  silent = true,
+  desc = "Insert: previous word",
+})
+
+-- yank all files in the same folder as the current buffer (with headers) to system clipboard
+vim.keymap.set("n", "<leader>fy", function()
+  -- directory of the current file
+  local dir = vim.fn.expand("%:p:h")
+  -- if the buffer has no file (e.g. [No Name]), fall back to cwd
+  if dir == "" then
+    dir = vim.fn.getcwd()
+  end
+
+  local files = vim.fn.readdir(dir)
+  local out = {}
+
+  for _, name in ipairs(files) do
+    local path = dir .. "/" .. name
+    if vim.fn.isdirectory(path) == 0 then
+      table.insert(out, "=== " .. name .. " ===")
+      for _, line in ipairs(vim.fn.readfile(path)) do
+        table.insert(out, line)
+      end
+      table.insert(out, "")
+    end
+  end
+
+  vim.fn.setreg("+", table.concat(out, "\n"))
+  print("📋 Yanked " .. #out .. " lines from " .. #files .. " files in: " .. dir)
+end, { desc = "fy: Yank all files in buffer’s folder to + register" })
