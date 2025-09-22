@@ -146,3 +146,4 @@ unset __conda_setup
 
 source /opt/openfoam12/etc/bashrc
 export PATH="$HOME/.local/bin:$PATH"
+. "$HOME/.cargo/env"
