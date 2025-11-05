@@ -42,3 +42,18 @@ vim.keymap.set("n", "<leader>fy", function()
   vim.fn.setreg("+", table.concat(out, "\n"))
   print("📋 Yanked " .. #out .. " lines from " .. #files .. " files in: " .. dir)
 end, { desc = "fy: Yank all files in buffer’s folder to + register" })
+
+-- Append the first diagnostic on the current line to the system clipboard
+vim.keymap.set("n", "<leader>xy", function()
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local diags = vim.diagnostic.get(0, { lnum = row })
+  if #diags > 0 then
+    local msg = (diags[1].message or ""):gsub("%s+", " ")
+    local current_clipboard = vim.fn.getreg("+")
+    local new_clipboard = current_clipboard ~= "" and (current_clipboard .. "\n" .. msg) or msg
+    vim.fn.setreg("+", new_clipboard) -- append to clipboard (+)
+    vim.notify("Appended diagnostic: " .. msg, vim.log.levels.INFO)
+  else
+    vim.notify("No diagnostics on this line", vim.log.levels.WARN)
+  end
+end, { desc = "Append diagnostic on line to clipboard" })
