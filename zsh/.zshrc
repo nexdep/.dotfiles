@@ -14,6 +14,43 @@ unsetopt BEEP
 # vim  mode - enter by pressing Esc
 setopt vi
 
+bindkey -M viins '^H' backward-delete-char
+bindkey -M viins '^?' backward-delete-char
+
+# --- Clipboard helpers for WSL2 ---
+# Send text to Windows clipboard
+clipboard-copy() {
+    print -rn -- "$1" | clip.exe
+}
+
+# Widget: yy  (copy line)
+zle-clipboard-yank-line() {
+    clipboard-copy "$BUFFER"
+}
+zle -N zle-clipboard-yank-line
+bindkey -M vicmd 'yy' zle-clipboard-yank-line
+
+# Widget: dd (delete line + copy)
+zle-clipboard-delete-line() {
+    clipboard-copy "$BUFFER"
+    BUFFER=""
+    CURSOR=0
+}
+zle -N zle-clipboard-delete-line
+bindkey -M vicmd 'dd' zle-clipboard-delete-line
+
+# Widget: p  (paste clipboard into buffer)
+zle-clipboard-paste() {
+    # Get Windows clipboard content
+    local clip="$(powershell.exe -NoProfile -Command Get-Clipboard | tr -d '\r')"
+    BUFFER="${BUFFER[1,CURSOR]}${clip}${BUFFER[CURSOR+1,-1]}"
+    CURSOR=$(( CURSOR + ${#clip} ))
+}
+zle -N zle-clipboard-paste
+bindkey -M vicmd 'p' zle-clipboard-paste
+
+
+
 
 ##########
 # HISTORY
