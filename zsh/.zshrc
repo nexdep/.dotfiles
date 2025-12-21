@@ -332,6 +332,9 @@ export PATH="$PATH:$HOME/.local/bin"
 eval "$(zoxide init zsh)"
 alias cd="z"
 
+# import secrets.env
+[ -f ~/.config/secrets.env ] && source ~/.config/secrets.env
+
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

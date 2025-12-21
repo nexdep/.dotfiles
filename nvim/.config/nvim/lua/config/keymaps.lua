@@ -16,6 +16,28 @@ vim.keymap.set("i", "<C-h>", "<C-o>b", {
   desc = "Insert: previous word",
 })
 
+-- CodeCompanion keymaps (LazyVim)
+vim.keymap.set(
+  { "n", "v" },
+  "<C-a>",
+  "<cmd>CodeCompanionActions<cr>",
+  { noremap = true, silent = true, desc = "AI Actions" }
+)
+vim.keymap.set(
+  { "n", "v" },
+  "<leader>a",
+  "<cmd>CodeCompanionChat Toggle<cr>",
+  { noremap = true, silent = true, desc = "AI Chat Toggle" }
+)
+vim.keymap.set(
+  "v",
+  "ga",
+  "<cmd>CodeCompanionChat Add<cr>",
+  { noremap = true, silent = true, desc = "AI Add Selection" }
+)
+
+vim.cmd([[cab cc CodeCompanion]])
+
 -- yank all files in the same folder as the current buffer (with headers) to system clipboard
 vim.keymap.set("n", "<leader>fy", function()
   -- directory of the current file

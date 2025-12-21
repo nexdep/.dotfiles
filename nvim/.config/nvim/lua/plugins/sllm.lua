@@ -13,6 +13,6 @@ return {
     -- Define your own mappings
     local sllm = require("sllm")
 
-    vim.keymap.set({ "n", "v" }, "<leader>a", sllm.ask_llm, { desc = "Ask LLM [custom]" })
+    vim.keymap.set({ "n", "v" }, "<leader>h", sllm.ask_llm, { desc = "Ask LLM [custom]" })
   end,
 }
