@@ -96,10 +96,7 @@ setopt SHARE_HISTORY
 ##########
  
 # Use modern completion system
-autoload -Uz compinit
-if ! type compinit &>/dev/null; then
-  compinit
-fi
+autoload -Uz compinit && compinit
  
  
  
