@@ -66,7 +66,7 @@ vim.keymap.set("n", "<leader>fy", function()
 end, { desc = "fy: Yank all files in buffer’s folder to + register" })
 
 -- Append the first diagnostic on the current line to the system clipboard
-vim.keymap.set("n", "<leader>xy", function()
+vim.keymap.set("n", "<leader>xa", function()
   local row = vim.api.nvim_win_get_cursor(0)[1] - 1
   local diags = vim.diagnostic.get(0, { lnum = row })
   if #diags > 0 then
@@ -79,3 +79,36 @@ vim.keymap.set("n", "<leader>xy", function()
     vim.notify("No diagnostics on this line", vim.log.levels.WARN)
   end
 end, { desc = "Append diagnostic on line to clipboard" })
+
+-- Send current line + diagnostics on that line to system clipboard
+vim.keymap.set("n", "<leader>xy", function()
+  local bufnr = 0
+  local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+
+  -- current line text
+  local line = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1] or ""
+  line = line:gsub("%s+$", "")
+
+  -- diagnostics on the line
+  local diags = vim.diagnostic.get(bufnr, { lnum = row })
+  if #diags == 0 then
+    vim.notify("No diagnostics on this line", vim.log.levels.WARN)
+    return
+  end
+
+  -- collect all diagnostics
+  local parts = {}
+  for _, d in ipairs(diags) do
+    local msg = (d.message or ""):gsub("%s+", " ")
+    if msg ~= "" then
+      table.insert(parts, msg)
+    end
+  end
+
+  local combined = line .. "\n" .. table.concat(parts, "\n")
+
+  -- overwrite clipboard (+)
+  vim.fn.setreg("+", combined)
+
+  vim.notify("Copied line + diagnostics to clipboard", vim.log.levels.INFO)
+end, { desc = "Copy current line + diagnostics to clipboard" })

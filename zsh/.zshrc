@@ -339,3 +339,4 @@ export NVM_DIR="$HOME/.nvm"
 source "$HOME/.cargo/env"
 export OPENMC_CROSS_SECTIONS="$HOME/openmc_data/endfb-viii.0-hdf5/cross_sections.xml"
 export OPENMC_CHAIN_FILE="/home/marco/openmc_data/chain_endfb81_fast/chain_endfb81_fast.xml"
+[ -r /opt/openfoam12/etc/bashrc ] && . /opt/openfoam12/etc/bashrc
