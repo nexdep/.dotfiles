@@ -37,3 +37,11 @@ vim.api.nvim_create_autocmd("TermOpen", {
     )
   end,
 })
+
+-- set no spelling in markdown files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown", "markdown.mdx" },
+  callback = function()
+    vim.opt_local.spell = false
+  end,
+})
