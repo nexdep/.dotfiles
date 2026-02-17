@@ -113,14 +113,22 @@ vim.keymap.set("n", "<leader>xy", function()
   vim.notify("Copied line + diagnostics to clipboard", vim.log.levels.INFO)
 end, { desc = "Copy current line + diagnostics to clipboard" })
 
--- terminal keymap: <leader>tt to toggle the terminal
+local last = { cmd = nil, opts = nil }
+
+local function toggle_and_remember(cmd, opts)
+  last.cmd = cmd
+  last.opts = opts
+  Snacks.terminal.toggle(cmd, opts)
+end
+
+-- horizontal (default id: cmd=nil)
 vim.keymap.set("n", "<leader>tt", function()
-  Snacks.terminal.toggle()
+  toggle_and_remember(nil, nil)
 end, { desc = "Toggle terminal" })
 
--- vertical terminal keymap: <leader>tv to toggle a vertical terminal on the right side
+-- vertical (different id because cmd is vim.o.shell)
 vim.keymap.set("n", "<leader>tv", function()
-  Snacks.terminal.toggle(vim.o.shell, {
+  toggle_and_remember(vim.o.shell, {
     win = {
       style = "terminal",
       position = "right",
@@ -128,3 +136,8 @@ vim.keymap.set("n", "<leader>tv", function()
     },
   })
 end, { desc = "Vertical terminal (right)" })
+
+-- Ctrl-/ (usually <C-_>) toggles the most recently used terminal
+vim.keymap.set({ "n", "t" }, "<C-_>", function()
+  Snacks.terminal.toggle(last.cmd, last.opts)
+end, { desc = "Toggle last terminal" })
