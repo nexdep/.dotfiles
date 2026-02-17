@@ -19,13 +19,13 @@ vim.keymap.set("i", "<C-h>", "<C-o>b", {
 -- CodeCompanion keymaps (LazyVim)
 vim.keymap.set(
   { "n", "v" },
-  "<C-a>",
+  "<leader>a",
   "<cmd>CodeCompanionActions<cr>",
   { noremap = true, silent = true, desc = "AI Actions" }
 )
 vim.keymap.set(
   { "n", "v" },
-  "<leader>a",
+  "<leader>aa",
   "<cmd>CodeCompanionChat Toggle<cr>",
   { noremap = true, silent = true, desc = "AI Chat Toggle" }
 )
@@ -112,3 +112,19 @@ vim.keymap.set("n", "<leader>xy", function()
 
   vim.notify("Copied line + diagnostics to clipboard", vim.log.levels.INFO)
 end, { desc = "Copy current line + diagnostics to clipboard" })
+
+-- terminal keymap: <leader>tt to toggle the terminal
+vim.keymap.set("n", "<leader>tt", function()
+  Snacks.terminal.toggle()
+end, { desc = "Toggle terminal" })
+
+-- vertical terminal keymap: <leader>tv to toggle a vertical terminal on the right side
+vim.keymap.set("n", "<leader>tv", function()
+  Snacks.terminal.toggle(vim.o.shell, {
+    win = {
+      style = "terminal",
+      position = "right",
+      width = 0.2,
+    },
+  })
+end, { desc = "Vertical terminal (right)" })
