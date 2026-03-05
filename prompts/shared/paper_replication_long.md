@@ -168,12 +168,54 @@ Create `replication_plan.md` including:
    - Every ESTIMATED value must include justification.
    - Every simplification must be documented.
 
-4. Step-by-step computational plan:
+4. Missing information registry:
+   For every MISSING item identified earlier, create an entry including:
+   - Name of missing element
+   - Where it is required in the workflow
+   - Whether it is likely retrievable from:
+        • paper appendix
+        • cited references
+        • public dataset
+        • author correspondence
+        • unknown source
+
+5. External data placeholders:
+   If data, parameters, or resources are missing but replication is otherwise feasible,
+   define explicit placeholders including:
+   - expected variable name
+   - expected format
+   - expected units
+   - expected file structure or URL format (if known)
+
+6. Step-by-step computational plan:
    - Deterministic
    - No hidden constants
    - All parameters declared explicitly at top
+   - All required inputs listed with expected format
 
-The plan must be sufficient to execute without rereading the paper.
+CRITICAL REQUIREMENT
+
+`replication_plan.md` must be written so that it can serve as a **stand-alone replication prompt**.
+
+Specifically:
+
+- A user should be able to modify this file by inserting:
+    • missing numerical values
+    • dataset paths
+    • download links
+    • API endpoints
+    • additional parameters
+
+- After inserting those items, the file should be usable as input to a **fresh replication attempt in a new directory** without needing to reread the paper.
+
+- The document must therefore include:
+    • full workflow description
+    • all parameters
+    • all required inputs
+    • explicit placeholders where information is missing
+    • instructions for where inserted values should appear.
+
+The plan must remain faithful to the original paper and must not introduce undocumented assumptions.
 
 --------------------------------------
 PHASE 7 — Replication Implementation
@@ -196,7 +238,7 @@ Constraints:
 PHASE 8 — Replication Audit
 --------------------------------------
 
-After execution, create `replication_report.md` including:
+After execution, create `replication/replication_report.md` including:
 
 1. Was replication successful? (YES / PARTIAL / NO)
 2. Numerical comparison table:
@@ -218,10 +260,11 @@ If replication succeeded:
 
 If replication failed:
 - Update `replication_plan.md` with:
-   - Attempted strategies
+   - Attempted strategies, pointing to the `replication` folder.
    - Failure reasons
    - Explicit missing information list
    - What additional information would enable replication
+   - must be written so that it can still serve as a **stand-alone replication prompt**.
 
 --------------------------------------
 GENERAL SAFETY CONDITIONS
