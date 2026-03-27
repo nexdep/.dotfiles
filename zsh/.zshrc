@@ -208,58 +208,110 @@ scroll() {
 bw_fetch_ssh() {
   local REF="$1"
   if [[ -z "$REF" ]]; then
-    echo "Usage: bw_fetch_ssh <item_id_or_exact_item_name>"
+    echo "Usage: bw_fetch_ssh <item_id_or_exact_item_name_or_ssh_host>"
     return 1
   fi
 
   local DEST_DIR="$HOME/.ssh"
+  local SSH_CONFIG="$HOME/.ssh/config"
   mkdir -p "$DEST_DIR" && chmod 700 "$DEST_DIR" || return 1
 
-  # Reuse BW_SESSION if valid; otherwise unlock.
   if [[ -z "$BW_SESSION" ]] || ! bw sync >/dev/null 2>&1; then
     export BW_SESSION="$(bw unlock --raw)" || return 1
   fi
 
-  # Resolve item id: UUID -> use directly; else exact-name match
   local ITEM_ID=""
-  if [[ "$REF" =~ '^[0-9a-fA-F-]{36}$' ]]; then
+  local RESOLVED_NAME="$REF"
+  local PRIVATE_KEY=""
+
+  _bw_find_exact_item_id() {
+    local name="$1"
+    bw list items --search "$name" \
+      | jq -r --arg n "$name" '.[] | select(.name == $n) | .id' \
+      | head -n 1
+  }
+
+  _bw_get_private_key() {
+    local item_id="$1"
+    local pk=""
+    pk="$(bw get item "$item_id" | jq -r '.sshKey.privateKey // empty')" || pk=""
+    if [[ -z "$pk" ]]; then
+      local att_name
+      att_name="$(bw get item "$item_id" | jq -r '.attachments[0].fileName // empty')" || att_name=""
+      if [[ -n "$att_name" ]]; then
+        pk="$(bw get attachment "$att_name" --itemid "$item_id" --output - 2>/dev/null)"
+      fi
+    fi
+    printf '%s' "$pk"
+  }
+
+  # 1) UUID -> direct
+  if [[ "$REF" =~ ^[0-9a-fA-F-]{36}$ ]]; then
     ITEM_ID="$REF"
   else
-    ITEM_ID="$(bw list items --search "$REF" \
-      | jq -r --arg n "$REF" '.[] | select(.name == $n) | .id' \
-      | head -n 1)"
+    # 2) exact item name
+    ITEM_ID="$(_bw_find_exact_item_id "$REF")"
+  fi
+
+  if [[ -n "$ITEM_ID" && "$ITEM_ID" != "null" ]]; then
+    PRIVATE_KEY="$(_bw_get_private_key "$ITEM_ID")"
+  fi
+
+  # 3) fallback: ssh host alias -> identityfile basename -> bitwarden exact item
+  if [[ -z "$PRIVATE_KEY" && "$REF" != "" ]]; then
+    local IDENTITY_FILE=""
+    local IDENTITY_BASENAME=""
+
+    if [[ -f "$SSH_CONFIG" ]]; then
+      IDENTITY_FILE="$(
+        ssh -G -F "$SSH_CONFIG" "$REF" 2>/dev/null \
+          | grep '^identityfile ' \
+          | tail -n 1 \
+          | sed 's/^identityfile //'
+      )"
+    else
+      IDENTITY_FILE="$(
+        ssh -G "$REF" 2>/dev/null \
+          | grep '^identityfile ' \
+          | tail -n 1 \
+          | sed 's/^identityfile //'
+      )"
+    fi
+
+    if [[ -n "$IDENTITY_FILE" ]]; then
+      IDENTITY_FILE="${IDENTITY_FILE/#\~/$HOME}"
+      IDENTITY_BASENAME="$(basename "$IDENTITY_FILE")"
+
+      if [[ -n "$IDENTITY_BASENAME" ]]; then
+        ITEM_ID="$(_bw_find_exact_item_id "$IDENTITY_BASENAME")"
+        if [[ -n "$ITEM_ID" && "$ITEM_ID" != "null" ]]; then
+          PRIVATE_KEY="$(_bw_get_private_key "$ITEM_ID")"
+          if [[ -n "$PRIVATE_KEY" ]]; then
+            RESOLVED_NAME="$IDENTITY_BASENAME"
+          fi
+        fi
+      fi
+    fi
   fi
 
   if [[ -z "$ITEM_ID" || "$ITEM_ID" == "null" ]]; then
     echo "Couldn't find an item with exact name: $REF"
+    echo "Also checked SSH-resolved IdentityFile and found no matching Bitwarden item."
     return 1
   fi
 
-  # Filename from item name (sanitized)
+  if [[ -z "$PRIVATE_KEY" ]]; then
+    echo "Found Bitwarden item, but no SSH private key found in it."
+    echo "Checked .sshKey.privateKey and attachments[0]."
+    return 1
+  fi
+
   local RAW_NAME BASENAME
   RAW_NAME="$(bw get item "$ITEM_ID" | jq -r '.name // "bitwarden_key"')" || return 1
   BASENAME="${RAW_NAME// /_}"
   BASENAME="${BASENAME//[^A-Za-z0-9._-]/_}"
   [[ -z "$BASENAME" ]] && BASENAME="bitwarden_key"
 
-  # Extract private key (sshKey field) or fallback to first attachment
-  local PRIVATE_KEY
-  PRIVATE_KEY="$(bw get item "$ITEM_ID" | jq -r '.sshKey.privateKey // empty')" || PRIVATE_KEY=""
-
-  if [[ -z "$PRIVATE_KEY" ]]; then
-    local ATT_NAME
-    ATT_NAME="$(bw get item "$ITEM_ID" | jq -r '.attachments[0].fileName // empty')" || ATT_NAME=""
-    if [[ -n "$ATT_NAME" ]]; then
-      PRIVATE_KEY="$(bw get attachment "$ATT_NAME" --itemid "$ITEM_ID" --output - 2>/dev/null)"
-    fi
-  fi
-
-  if [[ -z "$PRIVATE_KEY" ]]; then
-    echo "No SSH private key found in item (neither sshKey.privateKey nor attachments[0])."
-    return 1
-  fi
-
-  # Destination path with .frombw.N if needed
   local DEST_PATH="$DEST_DIR/$BASENAME"
   if [[ -e "$DEST_PATH" ]]; then
     local N=1
@@ -271,13 +323,14 @@ bw_fetch_ssh() {
   printf '%s\n' "$PRIVATE_KEY" > "$DEST_PATH" || return 1
   chmod 600 "$DEST_PATH"
 
-  # Derive public key
   if ! ssh-keygen -y -f "$DEST_PATH" > "${DEST_PATH}.pub" 2>/dev/null; then
     echo "Wrote private key, but failed to derive public key (bad key format or needs passphrase)."
     return 1
   fi
   chmod 644 "${DEST_PATH}.pub"
 
+  echo "Fetched Bitwarden item: $RAW_NAME"
+  [[ "$RESOLVED_NAME" != "$REF" ]] && echo "Resolved via SSH host '$REF' -> IdentityFile basename '$RESOLVED_NAME'"
   echo "Private key: $DEST_PATH"
   echo "Public  key: ${DEST_PATH}.pub"
 }
