@@ -1,10 +1,10 @@
-[includeIf "hasconfig:remote.*.url:github.com:nexdep/**"]
+[includeIf "hasconfig:remote.*.url:git@github.com:nexdep/**"]
   path = ~/.gitconfig-nexdep
 
 [includeIf "hasconfig:remote.*.url:https://github.com/nexdep/**"]
   path = ~/.gitconfig-nexdep
 
-[includeIf "hasconfig:remote.*.url:github.com:marco-de-pietri/**"]
+[includeIf "hasconfig:remote.*.url:git@github.com:marco-de-pietri/**"]
   path = ~/.gitconfig-marco
 
 [includeIf "hasconfig:remote.*.url:https://github.com/marco-de-pietri/**"]
