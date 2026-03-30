@@ -8,22 +8,21 @@ fi
 SCRIPT_USER="marco"
 SCRIPT_HOME="/home/$SCRIPT_USER"
 
-# Ensure target user exists
 if ! id "$SCRIPT_USER" >/dev/null 2>&1; then
   echo "User '$SCRIPT_USER' does not exist."
   exit 1
 fi
 
-# Ensure home exists
 if [ ! -d "$SCRIPT_HOME" ]; then
   echo "Home directory '$SCRIPT_HOME' does not exist."
   exit 1
 fi
 
-# Define the log file path and redirect all stdout and stderr to it (while still showing output on the terminal)
 LOG_FILE="$SCRIPT_HOME/ubuntu_install.log"
-install -o "$SCRIPT_USER" -g "$SCRIPT_USER" -m 0644 /dev/null "$LOG_FILE"
+touch "$LOG_FILE"
+chown "$SCRIPT_USER:$SCRIPT_USER" "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE") 2>&1
+
 
 # Update and upgrade the system
 export DEBIAN_FRONTEND=noninteractive
@@ -143,13 +142,14 @@ mv ./rga-folder/*/rga-preproc /usr/local/bin
 rm -rf ./rga-folder/
 rm rga.tar.gz
 
-# install uv as user
+# install uv and llm as user
 sudo -u "$SCRIPT_USER" bash <<EOF
+export HOME="$SCRIPT_HOME"
+export PATH="$SCRIPT_HOME/.local/bin:$PATH"
 curl -LsSf https://astral.sh/uv/install.sh | sh
-EOF
-
-# install simonw llm tool
+export PATH="$SCRIPT_HOME/.local/bin:$PATH"
 uv tool install llm
+EOF
 
 # install starship
 wget https://starship.rs/install.sh -O - | sh -s -- --yes
