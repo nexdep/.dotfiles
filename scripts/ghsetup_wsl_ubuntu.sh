@@ -187,4 +187,5 @@ stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME yazi
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME starship
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME tmux
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME gomi
+stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME ssh
 EOF
