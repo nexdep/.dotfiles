@@ -337,7 +337,7 @@ bw_fetch_ssh() {
 # function to fetch ssh keys << end
 
 # function to login or  unlock bitwarden and store the session >>> start
-bwlogin() {
+bw_login() {
   # Options:
   #   --no-relock : if status is unlocked but BW_SESSION missing, fail instead of lock+unlock
   local no_relock=0
