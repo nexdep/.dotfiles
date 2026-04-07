@@ -11,3 +11,4 @@
 	helper = "!f() { /home/host/.vscode-server-insiders/bin/3b2551cd990a02383190cc7670021ec6c30b86df-insider/node /tmp/vscode-remote-containers-606f3318-01f3-4b43-824d-38235b5dbe16.js git-credential-helper $*; }; f"
 [core]
     sshCommand = "ssh -i ~/.ssh/marco-dev-1 -o IdentitiesOnly=yes"
+    excludesFile = ~/.gitignore_global

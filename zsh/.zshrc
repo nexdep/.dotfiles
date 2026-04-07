@@ -50,8 +50,6 @@ zle -N zle-clipboard-paste
 bindkey -M vicmd 'p' zle-clipboard-paste
 
 
-
-
 ##########
 # HISTORY
 ##########
