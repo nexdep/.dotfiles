@@ -9,3 +9,8 @@
 
 [includeIf "hasconfig:remote.*.url:https://github.com/marco-de-pietri/**"]
   path = ~/.gitconfig-marco
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
