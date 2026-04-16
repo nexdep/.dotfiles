@@ -42,6 +42,7 @@ cd "$SCRIPT_HOME"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 source "$SCRIPT_HOME/.nvm/nvm.sh"
 nvm install --lts
+nvm alias default lts/*
 npm install -g tree-sitter-cli
 npm install -g @openai/codex
 npm install -g @bitwarden/cli
