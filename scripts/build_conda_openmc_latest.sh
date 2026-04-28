@@ -17,8 +17,8 @@ set -euo pipefail
 # ---------------------------
 # Configuration
 # ---------------------------
-ENV_NAME="openmc-dev-latest"
-GH_PROFILE="openmc-dev"  # Name of the conda environment
+ENV_NAME="openmc-dev-latest" # Name of the conda environment
+GH_PROFILE="openmc-dev"  
 PY_VER="3.14"
 
 # Directory where this script was launched
