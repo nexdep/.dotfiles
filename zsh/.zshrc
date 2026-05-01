@@ -156,12 +156,58 @@ fi
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
 
-# Show contents of the directory after changing to it
+# open explorer in the current directory
 explorer() {
   local target="${1:-.}"             # default to current dir
   /mnt/c/Windows/explorer.exe "$(wslpath -w "$target")"
 }
 
+# --- WSL path helpers ---------------------------------------------------------
+wsl_path() {
+  local p="$1"
+
+  # Windows drive path: C:\...
+  # UNC path: \\server\share
+  if [[ "$p" == [A-Za-z]:\\* || "$p" == \\\\* ]]; then
+    wslpath -u "$p"
+  else
+    printf '%s\n' "$p"
+  fi
+}
+
+_wsl_wrap_cmd() {
+  local cmd="$1"
+  shift
+
+  local args=()
+  for arg in "$@"; do
+    if [[ "$arg" == [A-Za-z]:\\* || "$arg" == \\\\* || "$arg" == /* || "$arg" == ./* || "$arg" == ../* ]]; then
+      args+=("$(wsl_path "$arg")")
+    else
+      args+=("$arg")
+    fi
+  done
+
+  "$cmd" "${args[@]}"
+}
+
+cpwsl() {
+  _wsl_wrap_cmd cp "$@"
+}
+
+mvwsl() {
+  _wsl_wrap_cmd mv "$@"
+}
+
+cdwsl() {
+  cd "$(wsl_path "$1")"
+}
+
+# Examples:
+# cpwsl 'C:\Users\marco\file.pdf' .
+# cpwsl -r 'C:\Users\marco\project' ./backup
+# mvwsl file.txt 'C:\Users\marco\Desktop'
+# cdwsl 'C:\Users\marco\Desktop'
 
 # navigation options
 setopt  autocd autopushd 
