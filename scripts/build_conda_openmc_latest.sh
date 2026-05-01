@@ -18,7 +18,7 @@ set -euo pipefail
 # Configuration
 # ---------------------------
 ENV_NAME="openmc-dev-latest" # Name of the conda environment
-GH_PROFILE="openmc-dev"  
+GH_PROFILE="openmc-dev"
 PY_VER="3.14"
 
 # Directory where this script was launched
@@ -110,6 +110,8 @@ echo "Installing Python package (editable mode with tests)"
 pip install -e '.[test]'
 pip install PySide6
 pip install openmc-plotter --no-deps
+
+conda install neutronics_material_maker -c conda-forge
 
 # ---------------------------
 # Verification
