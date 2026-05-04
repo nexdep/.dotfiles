@@ -113,31 +113,250 @@ vim.keymap.set("n", "<leader>xy", function()
   vim.notify("Copied line + diagnostics to clipboard", vim.log.levels.INFO)
 end, { desc = "Copy current line + diagnostics to clipboard" })
 
-local last = { cmd = nil, opts = nil }
+-- local last = { cmd = nil, opts = nil }
+--
+-- local function toggle_and_remember(cmd, opts)
+--   last.cmd = cmd
+--   last.opts = opts
+--   Snacks.terminal.toggle(cmd, opts)
+-- end
+--
+-- -- horizontal (default id: cmd=nil)
+-- vim.keymap.set("n", "<leader>tt", function()
+--   toggle_and_remember(nil, nil)
+-- end, { desc = "Toggle terminal" })
+--
+-- -- vertical (different id because cmd is vim.o.shell)
+-- vim.keymap.set("n", "<leader>tv", function()
+--   toggle_and_remember(vim.o.shell, {
+--     win = {
+--       style = "terminal",
+--       position = "right",
+--       width = 0.2,
+--     },
+--   })
+-- end, { desc = "Vertical terminal (right)" })
+--
+-- -- Ctrl-/ (usually <C-_>) toggles the most recently used terminal
+-- vim.keymap.set({ "n", "t" }, "<C-_>", function()
+--   Snacks.terminal.toggle(last.cmd, last.opts)
+-- end, { desc = "Toggle last terminal" })
 
-local function toggle_and_remember(cmd, opts)
-  last.cmd = cmd
-  last.opts = opts
-  Snacks.terminal.toggle(cmd, opts)
+-- Disable LazyVim defaults first
+pcall(vim.keymap.del, { "n", "t" }, "<C-/>")
+pcall(vim.keymap.del, { "n", "t" }, "<C-_>")
+
+local terminals = {
+  horizontal = {
+    kind = "snacks",
+    cmd = nil,
+    opts = {
+      env = { SNACKS_TERM_ID = "horizontal" },
+    },
+  },
+
+  vertical = {
+    kind = "snacks",
+    cmd = nil,
+    opts = {
+      env = { SNACKS_TERM_ID = "vertical" },
+      win = {
+        style = "terminal",
+        position = "right",
+        width = 0.2,
+      },
+    },
+  },
+
+  tab = {
+    kind = "tab",
+  },
+  buffer = {
+    kind = "buffer",
+  },
+}
+
+local last = terminals.horizontal
+
+local tab_term = {
+  buf = nil,
+}
+local buf_term = {
+  buf = nil,
+}
+
+local function buf_valid(buf)
+  return buf and vim.api.nvim_buf_is_valid(buf)
 end
 
--- horizontal (default id: cmd=nil)
-vim.keymap.set("n", "<leader>tt", function()
-  toggle_and_remember(nil, nil)
-end, { desc = "Toggle terminal" })
+local function find_buf_window(buf)
+  if not buf_valid(buf) then
+    return nil, nil
+  end
 
--- vertical (different id because cmd is vim.o.shell)
-vim.keymap.set("n", "<leader>tv", function()
-  toggle_and_remember(vim.o.shell, {
-    win = {
-      style = "terminal",
-      position = "right",
-      width = 0.2,
-    },
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      if vim.api.nvim_win_get_buf(win) == buf then
+        return tab, win
+      end
+    end
+  end
+
+  return nil, nil
+end
+
+local function open_explorer_if_available()
+  if not (Snacks and Snacks.explorer) then
+    return
+  end
+
+  local current_win = vim.api.nvim_get_current_win()
+
+  Snacks.explorer.open()
+
+  if vim.api.nvim_win_is_valid(current_win) then
+    vim.api.nvim_set_current_win(current_win)
+  end
+end
+
+local function open_tab_terminal()
+  last = terminals.tab
+
+  local tab, win = find_buf_window(tab_term.buf)
+
+  -- If the tab terminal is currently focused, hide/close it.
+  if tab and win and vim.api.nvim_get_current_tabpage() == tab then
+    if #vim.api.nvim_list_tabpages() > 1 then
+      vim.cmd.tabclose()
+    else
+      vim.cmd.hide()
+    end
+    return
+  end
+
+  -- Terminal buffer is already visible somewhere: jump to it.
+  if tab and win then
+    vim.api.nvim_set_current_tabpage(tab)
+    vim.api.nvim_set_current_win(win)
+    open_explorer_if_available()
+    vim.cmd.startinsert()
+    return
+  end
+
+  -- Terminal buffer exists but is hidden: open it directly in a new tab.
+  if buf_valid(tab_term.buf) then
+    vim.cmd("tab sbuffer " .. tab_term.buf)
+    open_explorer_if_available()
+    vim.cmd.startinsert()
+    return
+  end
+
+  -- Create a new terminal in a real Neovim tab.
+  vim.cmd.tabnew()
+  tab_term.buf = vim.api.nvim_get_current_buf()
+
+  vim.bo[tab_term.buf].bufhidden = "hide"
+
+  vim.fn.jobstart(vim.o.shell, { term = true })
+
+  vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], {
+    buffer = tab_term.buf,
+    desc = "Exit terminal mode",
   })
-end, { desc = "Vertical terminal (right)" })
 
--- Ctrl-/ (usually <C-_>) toggles the most recently used terminal
-vim.keymap.set({ "n", "t" }, "<C-_>", function()
-  Snacks.terminal.toggle(last.cmd, last.opts)
-end, { desc = "Toggle last terminal" })
+  open_explorer_if_available()
+  vim.cmd.startinsert()
+end
+
+local function open_buffer_terminal()
+  last = terminals.buffer
+
+  local tab, win = find_buf_window(buf_term.buf)
+
+  -- If the buffer terminal is currently focused, hide/switch away from it.
+  if tab and win and vim.api.nvim_get_current_tabpage() == tab and vim.api.nvim_get_current_win() == win then
+    vim.cmd.stopinsert()
+
+    -- If there is an alternate buffer, go back to it.
+    local alt = vim.fn.bufnr("#")
+    if alt > 0 and alt ~= buf_term.buf and vim.api.nvim_buf_is_valid(alt) then
+      vim.api.nvim_win_set_buf(0, alt)
+    else
+      vim.cmd.enew()
+    end
+
+    return
+  end
+
+  -- If terminal buffer is already visible elsewhere, jump to it.
+  if tab and win then
+    vim.api.nvim_set_current_tabpage(tab)
+    vim.api.nvim_set_current_win(win)
+    vim.cmd.startinsert()
+    return
+  end
+
+  -- If terminal buffer exists but is hidden, open it in current window.
+  if buf_valid(buf_term.buf) then
+    vim.api.nvim_win_set_buf(0, buf_term.buf)
+    vim.cmd.startinsert()
+    return
+  end
+
+  -- Create a normal listed terminal buffer in the current window.
+  vim.cmd.enew()
+  buf_term.buf = vim.api.nvim_get_current_buf()
+
+  vim.bo[buf_term.buf].bufhidden = "hide"
+  vim.bo[buf_term.buf].buflisted = true
+
+  vim.fn.jobstart(vim.o.shell, { term = true })
+
+  vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], {
+    buffer = buf_term.buf,
+    desc = "Exit terminal mode",
+  })
+
+  vim.cmd.startinsert()
+end
+
+local function toggle_term(term)
+  last = term
+
+  if term.kind == "tab" then
+    open_tab_terminal()
+  elseif term.kind == "buffer" then
+    open_buffer_terminal()
+  else
+    Snacks.terminal.toggle(term.cmd, term.opts)
+  end
+end
+
+-- Horizontal terminal
+vim.keymap.set("n", "<leader>tt", function()
+  toggle_term(terminals.horizontal)
+end, { desc = "Toggle horizontal terminal" })
+
+-- Vertical terminal
+vim.keymap.set("n", "<leader>tv", function()
+  toggle_term(terminals.vertical)
+end, { desc = "Toggle vertical terminal" })
+
+-- Real Neovim tab terminal
+vim.keymap.set("n", "<leader>tb", function()
+  toggle_term(terminals.buffer)
+end, { desc = "Terminal buffer" })
+
+-- Toggle most recently used terminal
+local function toggle_last()
+  if last.kind == "tab" then
+    open_tab_terminal()
+  elseif last.kind == "buffer" then
+    open_buffer_terminal()
+  else
+    Snacks.terminal.toggle(last.cmd, last.opts)
+  end
+end
+
+vim.keymap.set({ "n", "t" }, "<C-/>", toggle_last, { desc = "Toggle last terminal" })
+vim.keymap.set({ "n", "t" }, "<C-_>", toggle_last, { desc = "Toggle last terminal" })
