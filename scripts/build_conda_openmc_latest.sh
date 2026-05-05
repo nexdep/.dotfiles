@@ -110,8 +110,9 @@ echo "Installing Python package (editable mode with tests)"
 pip install -e '.[test]'
 pip install PySide6
 pip install openmc-plotter --no-deps
+pip install neutronics_material_maker
 
-conda install neutronics_material_maker -c conda-forge
+
 
 # ---------------------------
 # Verification
