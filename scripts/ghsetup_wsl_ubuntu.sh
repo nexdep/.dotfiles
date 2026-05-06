@@ -66,6 +66,8 @@ apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install openssh-server
 apt-get -y install bubblewrap
 apt-get -y install git-lfs
+apt-get -y install restic
+apt-get -y install fuse3 # for rclone
 
 # Install required packages for lazyvim
 apt-get -y install luarocks npm sqlite3 libsqlite3-dev
