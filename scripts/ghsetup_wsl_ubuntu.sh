@@ -67,7 +67,7 @@ apt-get -y install openssh-server
 apt-get -y install bubblewrap
 apt-get -y install git-lfs
 apt-get -y install restic
-apt-get -y install fuse3 # for rclone
+apt-get -y install fuse3 # for rclone/restic
 
 # Install required packages for lazyvim
 apt-get -y install luarocks npm sqlite3 libsqlite3-dev
@@ -122,6 +122,11 @@ EOF
 # install claude code as user
 sudo -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://claude.ai/install.sh | sh
+EOF
+
+# install rclone  as user
+sudo -u "$SCRIPT_USER" bash <<EOF
+curl -fsSL https://rclone.org/install.sh | bash
 EOF
 
 # install neovim from github release
