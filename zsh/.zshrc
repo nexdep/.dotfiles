@@ -561,7 +561,22 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-# end
+# autopull dotfiles - start
+stamp="$HOME/.cache/dotfiles-last-pull"
+dotfiles="$HOME/dotfiles"
+
+mkdir -p "$HOME/.cache"
+
+if [ ! -f "$stamp" ] || [ "$(find "$stamp" -mmin +60 2>/dev/null)" ]; then
+  touch "$stamp"
+  (
+    git -C "$dotfiles" fetch --quiet &&
+    git -C "$dotfiles" diff --quiet &&
+    git -C "$dotfiles" diff --cached --quiet &&
+    git -C "$dotfiles" pull --ff-only --quiet
+  ) &
+fi
+# autopull dotfiles - end
 
 
 export PATH="$PATH:$HOME/.local/bin"
