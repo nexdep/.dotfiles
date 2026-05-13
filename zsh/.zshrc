@@ -563,7 +563,7 @@ unset __conda_setup
 
 # autopull dotfiles - start
 stamp="$HOME/.cache/dotfiles-last-pull"
-dotfiles="$HOME/dotfiles"
+dotfiles="$HOME/.dotfiles"
 
 mkdir -p "$HOME/.cache"
 
