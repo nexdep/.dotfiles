@@ -567,7 +567,7 @@ dotfiles="$HOME/.dotfiles"
 
 mkdir -p "$HOME/.cache"
 
-if [ ! -f "$stamp" ] || [ "$(find "$stamp" -mmin +60 2>/dev/null)" ]; then
+if [ ! -f "$stamp" ] || [ "$(find "$stamp" -mmin +720 2>/dev/null)" ]; then
   touch "$stamp"
   (
     git -C "$dotfiles" fetch --quiet &&
