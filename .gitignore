@@ -1,0 +1,14 @@
+# Never commit raw GPG secrets
+*.sec
+*.key
+private.asc
+secret.asc
+secring.gpg
+.gnupg/
+
+# Allow encrypted GPG backup
+!gpg/private.asc.gpg
+!gpg/public.asc
+!gpg/ownertrust.txt
+!gpg/install.sh
+!gpg/README.md
