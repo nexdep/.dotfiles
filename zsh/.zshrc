@@ -568,13 +568,13 @@ dotfiles="$HOME/.dotfiles"
 mkdir -p "$HOME/.cache"
 
 if [ ! -f "$stamp" ] || [ "$(find "$stamp" -mmin +720 2>/dev/null)" ]; then
-  touch "$stamp"
-  (
+  {
     git -C "$dotfiles" fetch --quiet &&
     git -C "$dotfiles" diff --quiet &&
     git -C "$dotfiles" diff --cached --quiet &&
-    git -C "$dotfiles" pull --ff-only --quiet
-  ) &
+    git -C "$dotfiles" pull --ff-only --quiet &&
+    touch "$stamp"
+  } >/dev/null 2>&1 &!
 fi
 # autopull dotfiles - end
 
