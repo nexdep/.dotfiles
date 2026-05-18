@@ -124,6 +124,11 @@ sudo -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://claude.ai/install.sh | sh
 EOF
 
+# install tailscale as user
+sudo -u "$SCRIPT_USER" bash <<EOF
+curl -fsSL https://tailscale.com/install.sh | sh
+EOF
+
 # install rclone  as user
 sudo -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://rclone.org/install.sh | bash
