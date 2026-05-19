@@ -8,7 +8,7 @@ trap 'rm -f "$tmp"' EXIT
 
 {
   printf 'OPENROUTER_API_KEY='
-  pass show api/marco-openrouter-key-1 | head -n1
+  gopass show api/marco-openrouter-key-1 | head -n1
   printf '\n'
 } >"$tmp"
 
