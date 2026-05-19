@@ -66,10 +66,21 @@ gpg --import "$PUBLIC_KEY"
 echo "Importing private key..."
 gpg --import "$PRIVATE_KEY"
 
-if [[ -f "$OWNERTRUST" ]]; then
-  echo "Importing owner trust..."
-  gpg --import-ownertrust "$OWNERTRUST"
+KEY_FPR="$(
+  gpg --list-secret-keys --with-colons --fingerprint |
+    awk -F: '
+      /^sec:/ { found = 1 }
+      found && /^fpr:/ { print $10; exit }
+    '
+)"
+
+if [[ -z "$KEY_FPR" ]]; then
+  echo "Error: could not find imported secret key fingerprint." >&2
+  exit 1
 fi
+
+echo "Trusting imported key..."
+echo "$KEY_FPR:6:" | gpg --import-ownertrust
 
 chmod 700 "$HOME/.gnupg"
 find "$HOME/.gnupg" -type f -exec chmod 600 {} \;
