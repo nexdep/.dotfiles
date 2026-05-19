@@ -66,7 +66,7 @@ apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install openssh-server
 apt-get -y install bubblewrap
 apt-get -y install git-lfs
-apt-get -y install gnupg
+apt-get -y install gnupg rng-tools
 apt-get -y install restic fuse3 sshfs # backups
 
 # Install required packages for lazyvim
