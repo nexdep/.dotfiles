@@ -23,7 +23,6 @@ touch "$LOG_FILE"
 chown "$SCRIPT_USER:$SCRIPT_USER" "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-
 # Update and upgrade the system
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -49,15 +48,15 @@ npm install -g @bitwarden/cli
 EOF
 
 # install gh cli
-(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
-	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
-	&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-	&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
-	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-	&& sudo apt update \
-	&& sudo apt install gh -y
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
+  sudo mkdir -p -m 755 /etc/apt/keyrings &&
+  out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg &&
+  cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null &&
+  sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg &&
+  sudo mkdir -p -m 755 /etc/apt/sources.list.d &&
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null &&
+  sudo apt update &&
+  sudo apt install gh -y
 
 # Install more packages
 apt-get -y install ffmpeg pandoc fd-find ripgrep tmux
@@ -68,6 +67,23 @@ apt-get -y install bubblewrap
 apt-get -y install git-lfs
 apt-get -y install gnupg rng-tools
 apt-get -y install restic fuse3 sshfs # backups
+
+# install gopass
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+curl -fsSL https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg \
+  | sudo tee /usr/share/keyrings/gopass-archive-keyring.gpg >/dev/null
+EOF
+
+sudo tee /etc/apt/sources.list.d/gopass.sources >/dev/null <<'EOF'
+Types: deb
+URIs: https://packages.gopass.pw/repos/gopass
+Suites: stable
+Architectures: all amd64 arm64 armhf
+Components: main
+Signed-By: /usr/share/keyrings/gopass-archive-keyring.gpg
+EOF
+sudo apt update
+sudo apt install -y gopass gopass-archive-keyring
 
 # Install required packages for lazyvim
 apt-get -y install luarocks npm sqlite3 libsqlite3-dev
