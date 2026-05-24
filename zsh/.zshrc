@@ -599,3 +599,14 @@ export OPENMC_CHAIN_FILE="$HOME/openmc_data/chain_endfb81_fast/chain_endfb81_fas
 
 # OpenFOAM
 [ -r /opt/openfoam12/etc/bashrc ] && . /opt/openfoam12/etc/bashrc
+
+# Auto-start tmux for local interactive terminals only
+# Skip if already in tmux, over SSH, inside VS Code, or inside Neovim terminal
+if [[ -z "$TMUX" \
+   && -n "$PS1" \
+   && -z "$SSH_CONNECTION" \
+   && "$TERM_PROGRAM" != "vscode" \
+   && -z "$NVIM" ]]; then
+  tmux attach-session -t main || tmux new-session -s main
+fi
+
