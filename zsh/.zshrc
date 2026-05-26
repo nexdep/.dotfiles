@@ -589,16 +589,48 @@ alias cd="z"
 [ -f ~/.config/secrets.env ] && source ~/.config/secrets.env
 
 
+# lazy load nvm - start
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-nvm use default >/dev/null
+
+_load_nvm() {
+  unset -f nvm node npm npx corepack
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+}
+
+nvm() {
+  _load_nvm
+  nvm "$@"
+}
+
+node() {
+  _load_nvm
+  node "$@"
+}
+
+npm() {
+  _load_nvm
+  npm "$@"
+}
+
+npx() {
+  _load_nvm
+  npx "$@"
+}
+
+corepack() {
+  _load_nvm
+  corepack "$@"
+}
+# lazy load nvm - end
+
 export OPENMC_CROSS_SECTIONS="$HOME/openmc_data/endfb-viii.0-hdf5/cross_sections.xml"
 export OPENMC_CHAIN_FILE="$HOME/openmc_data/chain_endfb81_fast/chain_endfb81_fast.xml"
 
 
-# OpenFOAM
-[ -r /opt/openfoam12/etc/bashrc ] && . /opt/openfoam12/etc/bashrc
+# lazy load openfoam12
+of12() {
+  . /opt/openfoam12/etc/bashrc
+}
 
 # Auto-start tmux for local interactive terminals only
 # Skip if already in tmux, over SSH, inside VS Code, or inside Neovim terminal
