@@ -216,9 +216,9 @@ setopt  autocd autopushd
 export PATH="/home/root/.local/bin:$PATH"
 export PATH="/opt/nvim/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
-export WORKF="/mnt/c/Users/marco/OneDrive - UNED/01_WORK/"
 
 # use vim keybindings in less
 export VISUAL=vim
@@ -579,7 +579,6 @@ fi
 # autopull dotfiles - end
 
 
-export PATH="$PATH:$HOME/.local/bin"
 
 #zoxide part
 eval "$(zoxide init zsh)"
@@ -641,4 +640,5 @@ if [[ -z "$TMUX" \
    && -z "$NVIM" ]]; then
   tmux attach-session -t main || tmux new-session -s main
 fi
+
 
