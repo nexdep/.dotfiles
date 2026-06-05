@@ -43,7 +43,6 @@ source "$SCRIPT_HOME/.nvm/nvm.sh"
 nvm install --lts
 nvm alias default lts/*
 npm install -g tree-sitter-cli
-npm install -g @openai/codex
 npm install -g @bitwarden/cli
 EOF
 
@@ -138,6 +137,11 @@ EOF
 # install claude code as user
 sudo -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://claude.ai/install.sh | sh
+EOF
+
+# install codex as user
+sudo -u "$SCRIPT_USER" bash <<EOF
+curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 EOF
 
 # install tailscale as user
