@@ -9,6 +9,5 @@
     prompt = false
 [core]
     sshCommand = "ssh -i ~/.ssh/marco-dev-2 -o IdentitiesOnly=yes"
-    excludesFile = ~/.gitignore_global
 
 

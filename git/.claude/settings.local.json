@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Read(//home/marco/.dotfiles/**)",
+      "Read(//home/marco/**)",
+      "Bash(rm /home/marco/.gitconfig-marco)",
+      "Bash(ln -s .dotfiles/git/.gitconfig_marco /home/marco/.gitconfig_marco)",
+      "Bash(ln -s .dotfiles/git/.gitconfig_nexdep /home/marco/.gitconfig_nexdep)"
+    ]
+  }
+}
