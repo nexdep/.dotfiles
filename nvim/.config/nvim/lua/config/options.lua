@@ -19,5 +19,5 @@ if vim.fn.has("wsl") == 1 then
   }
 end
 
--- set line length marker at 80 characters
+-- set line length marker at 100 characters
 vim.opt.textwidth = 100
