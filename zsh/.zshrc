@@ -622,7 +622,7 @@ corepack() {
 }
 # lazy load nvm - end
 
-export OPENMC_CROSS_SECTIONS="$HOME/openmc_data/endfb-viii.0-hdf5/cross_sections.xml"
+export OPENMC_CROSS_SECTIONS="/home/marco/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
 export OPENMC_CHAIN_FILE="$HOME/openmc_data/chain_endfb81_fast/chain_endfb81_fast.xml"
 
 
