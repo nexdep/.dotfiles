@@ -17,37 +17,6 @@ setopt vi
 bindkey -M viins '^H' backward-delete-char
 bindkey -M viins '^?' backward-delete-char
 
-# --- Clipboard helpers for WSL2 ---
-# Send text to Windows clipboard
-clipboard-copy() {
-    print -rn -- "$1" | clip.exe
-}
-
-# Widget: yy  (copy line)
-zle-clipboard-yank-line() {
-    clipboard-copy "$BUFFER"
-}
-zle -N zle-clipboard-yank-line
-bindkey -M vicmd 'yy' zle-clipboard-yank-line
-
-# Widget: dd (delete line + copy)
-zle-clipboard-delete-line() {
-    clipboard-copy "$BUFFER"
-    BUFFER=""
-    CURSOR=0
-}
-zle -N zle-clipboard-delete-line
-bindkey -M vicmd 'dd' zle-clipboard-delete-line
-
-# Widget: p  (paste clipboard into buffer)
-zle-clipboard-paste() {
-    # Get Windows clipboard content
-    local clip="$(powershell.exe -NoProfile -Command Get-Clipboard | tr -d '\r')"
-    BUFFER="${BUFFER[1,CURSOR]}${clip}${BUFFER[CURSOR+1,-1]}"
-    CURSOR=$(( CURSOR + ${#clip} ))
-}
-zle -N zle-clipboard-paste
-bindkey -M vicmd 'p' zle-clipboard-paste
 
 
 ##########
@@ -148,66 +117,9 @@ alias ....='cd ../../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
-# gomi alias for removing files
-if command -v gomi >/dev/null 2>&1; then
-  alias gm='gomi'
-fi
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
-
-# open explorer in the current directory
-explorer() {
-  local target="${1:-.}"             # default to current dir
-  /mnt/c/Windows/explorer.exe "$(wslpath -w "$target")"
-}
-
-# --- WSL path helpers ---------------------------------------------------------
-wsl_path() {
-  local p="$1"
-
-  # Windows drive path: C:\...
-  # UNC path: \\server\share
-  if [[ "$p" == [A-Za-z]:\\* || "$p" == \\\\* ]]; then
-    wslpath -u "$p"
-  else
-    printf '%s\n' "$p"
-  fi
-}
-
-_wsl_wrap_cmd() {
-  local cmd="$1"
-  shift
-
-  local args=()
-  for arg in "$@"; do
-    if [[ "$arg" == [A-Za-z]:\\* || "$arg" == \\\\* || "$arg" == /* || "$arg" == ./* || "$arg" == ../* ]]; then
-      args+=("$(wsl_path "$arg")")
-    else
-      args+=("$arg")
-    fi
-  done
-
-  "$cmd" "${args[@]}"
-}
-
-cpwsl() {
-  _wsl_wrap_cmd cp "$@"
-}
-
-mvwsl() {
-  _wsl_wrap_cmd mv "$@"
-}
-
-cdwsl() {
-  cd "$(wsl_path "$1")"
-}
-
-# Examples:
-# cpwsl 'C:\Users\marco\file.pdf' .
-# cpwsl -r 'C:\Users\marco\project' ./backup
-# mvwsl file.txt 'C:\Users\marco\Desktop'
-# cdwsl 'C:\Users\marco\Desktop'
 
 # navigation options
 setopt  autocd autopushd 
@@ -521,17 +433,6 @@ cf() {
 }
 # function end
 
-# launcher function for yazi
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-# function end
-
 
 
 # starship
@@ -543,22 +444,6 @@ source <(fzf --zsh)
 export DISPLAY=:0.0
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/marco/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/marco/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/home/marco/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/marco/miniforge3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
 # autopull dotfiles - start
 stamp="$HOME/.cache/dotfiles-last-pull"
@@ -577,14 +462,6 @@ if [ ! -f "$stamp" ] || [ "$(find "$stamp" -mmin +720 2>/dev/null)" ]; then
 fi
 # autopull dotfiles - end
 
-
-
-#zoxide part
-eval "$(zoxide init zsh)"
-alias cd="z"
-
-# import secrets.env
-[ -f ~/.config/secrets.env ] && source ~/.config/secrets.env
 
 
 # lazy load nvm - start
@@ -621,16 +498,17 @@ corepack() {
 }
 # lazy load nvm - end
 
-export OPENMC_CROSS_SECTIONS="$HOME/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
-export OPENMC_CHAIN_FILE="$HOME/openmc_data/chain_endfb81_fast/chain_endfb81_fast.xml"
 export DFILES="$HOME/.dotfiles"
-export ENDFB81_XS="$HOME/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
 
-
-# lazy load openfoam12
-of12() {
-  . /opt/openfoam12/etc/bashrc
+# local zsh sourcing
+source_if_exists() {
+  [[ -f "$1" ]] && source "$1"
 }
+
+
+source_if_exists "$HOME/.zsh/wsl_neutronics.zsh"
+source_if_exists "$HOME/.config/secrets.env"
+
 
 # Auto-start tmux for local interactive terminals only
 # Skip if already in tmux, over SSH, inside VS Code, or inside Neovim terminal
@@ -641,5 +519,4 @@ if [[ -z "$TMUX" \
    && -z "$NVIM" ]]; then
   tmux attach-session -t main || tmux new-session -s main
 fi
-
 

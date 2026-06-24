@@ -58,7 +58,6 @@ EOF
   sudo apt install gh -y
 
 # Install more packages
-apt-get -y install ffmpeg pandoc fd-find ripgrep tmux
 apt-get -y install jq poppler-utils chafa liblua5.1-0-dev python3-venv gpg
 apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install openssh-server
@@ -125,15 +124,6 @@ git clone --depth 1 https://github.com/junegunn/fzf.git "$SCRIPT_HOME/.fzf"
 mv "$SCRIPT_HOME/.fzf/bin/"* /usr/local/bin
 rm -rf "$SCRIPT_HOME/.fzf/"
 
-# install miniforge
-sudo -H -u "$SCRIPT_USER" bash <<EOF
-cd "$SCRIPT_HOME"
-curl -L -o miniforge.sh \
-  "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-bash miniforge.sh -b -p "$SCRIPT_HOME/miniforge3"
-rm miniforge.sh
-EOF
-
 # install claude code as user
 sudo -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://claude.ai/install.sh | sh
@@ -163,16 +153,6 @@ tar -C /opt -xzvf nvim.tar.gz
 mv "/opt/$NVIM_TEMP" "/opt/nvim"
 rm nvim.tar.gz
 
-# install yazi latest
-cd "$SCRIPT_HOME"
-wget -qO yazi.zip https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip
-7z x yazi.zip -o./yazi-temp
-mv yazi-temp/*/yazi /usr/local/bin
-mv yazi-temp/*/ya /usr/local/bin
-mv yazi-temp/*/completions/_ya /usr/local/share/zsh/site-functions
-mv yazi-temp/*/completions/_yazi /usr/local/share/zsh/site-functions
-rm -rf yazi-temp yazi.zip
-
 # install ripgrep-all
 cd "$SCRIPT_HOME"
 RGA_VERSION=$(curl -s "https://api.github.com/repos/phiresky/ripgrep-all/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
@@ -199,9 +179,6 @@ EOF
 # install starship
 wget https://starship.rs/install.sh -O - | sh -s -- --yes
 
-# install gomi as user
-curl -fsSL https://gomi.dev/install | PREFIX=/usr/local/bin bash
-
 # Remove existing files that might conflict with stow
 rm -f "$SCRIPT_HOME/.bashrc"
 rm -f "$SCRIPT_HOME/.condarc"
@@ -210,11 +187,6 @@ rm -f "$SCRIPT_HOME/.gitconfig"
 rm -f "$SCRIPT_HOME/.motd_shown"
 rm -f "$SCRIPT_HOME/.sudo_as_admin_successful"
 rm -rf "$SCRIPT_HOME/.cache/"
-
-# Install zoxide as user
-sudo -u "$SCRIPT_USER" bash <<EOF
-curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
-EOF
 
 # Set zsh as the default shell for the user by directly editing /etc/passwd
 sed -i -E "s|^($SCRIPT_USER:[^:]+:[0-9]+:[0-9]+:[^:]*:[^:]+):[^:]+|\1:/bin/zsh|" /etc/passwd
@@ -233,5 +205,4 @@ stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME starship
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME tmux
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME gomi
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME ssh
-stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME zsh_wsl_neutronics
 EOF
