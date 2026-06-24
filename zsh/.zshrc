@@ -218,7 +218,6 @@ export PATH="/opt/nvim/bin:$PATH"
 export PATH=/mnt/c/Users/marco/AppData/Local/Programs/Microsoft\ VS\ Code/bin:$PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-export DOTFILES="/mnt/c/Users/marco/OneDrive/Documenti/05_SHARED_SETTINGS/03_DOTFILES_WSL/"
 
 # use vim keybindings in less
 export VISUAL=vim
@@ -622,8 +621,10 @@ corepack() {
 }
 # lazy load nvm - end
 
-export OPENMC_CROSS_SECTIONS="/home/marco/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
+export OPENMC_CROSS_SECTIONS="$HOME/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
 export OPENMC_CHAIN_FILE="$HOME/openmc_data/chain_endfb81_fast/chain_endfb81_fast.xml"
+export DFILES="$HOME/.dotfiles"
+export ENDFB81_XS="$HOME/openmc_data/endfb-viii.1-hdf5/cross_sections.xml"
 
 
 # lazy load openfoam12
