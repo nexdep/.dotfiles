@@ -125,6 +125,19 @@ bindkey '^X' clear-screen
 bindkey -r '^L'
 bindkey -r '^H'
 
+# disable also  Alt-L and Alt-H
+bindkey -r '^[h'
+bindkey -r '^[l'
+# weird machinery to use alt-h for other stuff
+noop() {}
+zle -N noop
+
+bindkey -M emacs '^[h' noop
+bindkey -M emacs '^[l' noop
+bindkey -M viins '^[h' noop
+bindkey -M viins '^[l' noop
+bindkey -M vicmd '^[h' noop
+bindkey -M vicmd '^[l' noop
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
