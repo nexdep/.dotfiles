@@ -117,6 +117,14 @@ alias ....='cd ../../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
+# use control x for clear screen (control l could be better used in tmux)
+# Clear screen with Ctrl-X then l
+bindkey '^X' clear-screen
+
+# disable Ctrl-L and Ctrl-H
+bindkey -r '^L'
+bindkey -r '^H'
+
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
