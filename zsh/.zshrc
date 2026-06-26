@@ -117,27 +117,33 @@ alias ....='cd ../../..'
 alias -s {i,mpi}=nvim
 alias jupyter-notebook="~/.local/bin/jupyter-notebook --no-browser"
 
-# use control x for clear screen (control l could be better used in tmux)
-# Clear screen with Ctrl-X then l
+
+# use control x for clear screen  >>> start
 bindkey '^X' clear-screen
+
+# disable alt/shift-alt + LH
+# no-op widget
+noop() {}
+zle -N noop
 
 # disable Ctrl-L and Ctrl-H
 bindkey -r '^L'
 bindkey -r '^H'
 
-# disable also  Alt-L and Alt-H
+# disable Alt-H / Alt-L and Alt-Shift-H / Alt-Shift-L
 bindkey -r '^[h'
 bindkey -r '^[l'
-# weird machinery to use alt-h for other stuff
-noop() {}
-zle -N noop
+bindkey -r '^[H'
+bindkey -r '^[L'
 
-bindkey -M emacs '^[h' noop
-bindkey -M emacs '^[l' noop
-bindkey -M viins '^[h' noop
-bindkey -M viins '^[l' noop
-bindkey -M vicmd '^[h' noop
-bindkey -M vicmd '^[l' noop
+# force them to do nothing in common keymaps
+for keymap in emacs viins vicmd; do
+  bindkey -M "$keymap" '^[h' noop
+  bindkey -M "$keymap" '^[l' noop
+  bindkey -M "$keymap" '^[H' noop
+  bindkey -M "$keymap" '^[L' noop
+done
+# use control x for clear screen  <<< end
 
 # Show contents of the directory after changing to it
 chpwd (){ eza -ahlF  --git --git-repos; }
