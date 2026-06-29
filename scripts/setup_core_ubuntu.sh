@@ -58,6 +58,7 @@ EOF
   sudo apt install gh -y
 
 # Install more packages
+apt-get -y install tmux
 apt-get -y install jq poppler-utils chafa liblua5.1-0-dev python3-venv gpg
 apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install openssh-server
@@ -153,27 +154,12 @@ tar -C /opt -xzvf nvim.tar.gz
 mv "/opt/$NVIM_TEMP" "/opt/nvim"
 rm nvim.tar.gz
 
-# install ripgrep-all
-cd "$SCRIPT_HOME"
-RGA_VERSION=$(curl -s "https://api.github.com/repos/phiresky/ripgrep-all/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-echo "Fetched RGA_VERSION: $RGA_VERSION"
-curl -Lo rga.tar.gz "https://github.com/phiresky/ripgrep-all/releases/download/v${RGA_VERSION}/ripgrep_all-v${RGA_VERSION}-x86_64-unknown-linux-musl.tar.gz"
-echo "constructed url: https://github.com/phiresky/ripgrep-all/releases/download/v${RGA_VERSION}/ripgrep_all-v${RGA_VERSION}-x86_64-unknown-linux-musl.tar.gz"
-mkdir -p rga-folder
-tar xzvf rga.tar.gz -C ./rga-folder
-mv ./rga-folder/*/rga /usr/local/bin
-mv ./rga-folder/*/rga-fzf /usr/local/bin
-mv ./rga-folder/*/rga-preproc /usr/local/bin
-rm -rf ./rga-folder/
-rm rga.tar.gz
-
-# install uv and llm as user
+# install uv  as user
 sudo -u "$SCRIPT_USER" bash <<EOF
 export HOME="$SCRIPT_HOME"
 export PATH="$SCRIPT_HOME/.local/bin:$PATH"
 curl -LsSf https://astral.sh/uv/install.sh | sh
 export PATH="$SCRIPT_HOME/.local/bin:$PATH"
-uv tool install llm
 EOF
 
 # install starship
@@ -195,14 +181,10 @@ sed -i -E "s|^($SCRIPT_USER:[^:]+:[0-9]+:[0-9]+:[^:]*:[^:]+):[^:]+|\1:/bin/zsh|"
 sudo -u "$SCRIPT_USER" bash <<EOF
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME zsh
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME bash
-stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME wsl
-stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME conda
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME git
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME vim
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME nvim
-stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME yazi
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME starship
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME tmux
-stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME gomi
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME ssh
 EOF
