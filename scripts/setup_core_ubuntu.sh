@@ -1,5 +1,7 @@
 #!/bin/bash
-# Ensure the script is run as root (with sudo)
+# Core setup for Ubuntu 24.04+. Run as root (with sudo).
+set -e
+
 if [ "$EUID" -ne 0 ]; then
   echo "Please run this script as root or use sudo."
   exit 1
@@ -23,6 +25,10 @@ touch "$LOG_FILE"
 chown "$SCRIPT_USER:$SCRIPT_USER" "$LOG_FILE"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
+# Temporary directory for downloads, so failures don't leave root-owned files in $SCRIPT_HOME
+WORKDIR=$(mktemp -d)
+trap 'rm -rf "$WORKDIR"' EXIT
+
 # Update and upgrade the system
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
@@ -35,8 +41,8 @@ apt-get autoclean -y
 apt-get -y install gcc stow zsh curl p7zip build-essential software-properties-common unzip wget
 
 # install node and npm
-cd "$SCRIPT_HOME"
 sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
 cd "$SCRIPT_HOME"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 source "$SCRIPT_HOME/.nvm/nvm.sh"
@@ -68,12 +74,10 @@ apt-get -y install gnupg rng-tools
 apt-get -y install restic fuse3 sshfs # backups
 
 # install gopass
-sudo -H -u "$SCRIPT_USER" bash <<EOF
 curl -fsSL https://packages.gopass.pw/repos/gopass/gopass-archive-keyring.gpg \
-  | sudo tee /usr/share/keyrings/gopass-archive-keyring.gpg >/dev/null
-EOF
+  -o /usr/share/keyrings/gopass-archive-keyring.gpg
 
-sudo tee /etc/apt/sources.list.d/gopass.sources >/dev/null <<'EOF'
+tee /etc/apt/sources.list.d/gopass.sources >/dev/null <<'EOF'
 Types: deb
 URIs: https://packages.gopass.pw/repos/gopass
 Suites: stable
@@ -81,8 +85,8 @@ Architectures: all amd64 arm64 armhf
 Components: main
 Signed-By: /usr/share/keyrings/gopass-archive-keyring.gpg
 EOF
-sudo apt update
-sudo apt install -y gopass gopass-archive-keyring
+apt update
+apt install -y gopass gopass-archive-keyring
 
 # Install required packages for lazyvim
 apt-get -y install luarocks npm sqlite3 libsqlite3-dev
@@ -97,56 +101,54 @@ apt-get -y install fastfetch
 
 # install eza
 mkdir -p /etc/apt/keyrings
-wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor --yes -o /etc/apt/keyrings/gierens.gpg
 echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | tee /etc/apt/sources.list.d/gierens.list
 sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 sudo apt update
 sudo apt install -y eza
 
 # Install lazygit
-cd "$SCRIPT_HOME"
-LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+cd "$WORKDIR"
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*') || {
+  echo "Failed to determine latest lazygit version (GitHub API rate limit?)"
+  exit 1
+}
 curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
 tar xzvf lazygit.tar.gz lazygit
-sudo install lazygit -D -t /usr/local/bin/
-rm lazygit
-rm lazygit.tar.gz
+install lazygit -D -t /usr/local/bin/
 
 # install imagemagick binary from its website
-cd "$SCRIPT_HOME"
-wget https://imagemagick.org/archive/binaries/magick
+cd "$WORKDIR"
+wget -O magick https://imagemagick.org/archive/binaries/magick
 chmod +x magick
 mv magick /usr/local/bin
 
 # install fzf from github
-cd "$SCRIPT_HOME"
-git clone --depth 1 https://github.com/junegunn/fzf.git "$SCRIPT_HOME/.fzf"
-"$SCRIPT_HOME/.fzf/install" --bin
-mv "$SCRIPT_HOME/.fzf/bin/"* /usr/local/bin
-rm -rf "$SCRIPT_HOME/.fzf/"
+cd "$WORKDIR"
+git clone --depth 1 https://github.com/junegunn/fzf.git "$WORKDIR/fzf"
+"$WORKDIR/fzf/install" --bin
+mv "$WORKDIR/fzf/bin/"* /usr/local/bin
 
 # install claude code as user
-sudo -u "$SCRIPT_USER" bash <<EOF
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
 curl -fsSL https://claude.ai/install.sh | sh
 EOF
 
 # install codex as user
-sudo -u "$SCRIPT_USER" bash <<EOF
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
 curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 EOF
 
-# install tailscale as user
-sudo -u "$SCRIPT_USER" bash <<EOF
+# install tailscale (system-wide, needs root)
 curl -fsSL https://tailscale.com/install.sh | sh
-EOF
 
-# install rclone  as user
-sudo -u "$SCRIPT_USER" bash <<EOF
-curl -fsSL https://rclone.org/install.sh | bash
-EOF
+# install rclone (system-wide, needs root; exits 3 when already up to date)
+curl -fsSL https://rclone.org/install.sh | bash || [ $? -eq 3 ]
 
 # install neovim from github release
-cd "$SCRIPT_HOME"
+cd "$WORKDIR"
 curl -Lo nvim.tar.gz "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz"
 rm -rf /opt/nvim
 NVIM_TEMP=$(tar -tzf nvim.tar.gz | head -1 | cut -f1 -d"/")
@@ -154,12 +156,10 @@ tar -C /opt -xzvf nvim.tar.gz
 mv "/opt/$NVIM_TEMP" "/opt/nvim"
 rm nvim.tar.gz
 
-# install uv  as user
-sudo -u "$SCRIPT_USER" bash <<EOF
-export HOME="$SCRIPT_HOME"
-export PATH="$SCRIPT_HOME/.local/bin:$PATH"
+# install uv as user
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
 curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="$SCRIPT_HOME/.local/bin:$PATH"
 EOF
 
 # install starship
@@ -174,11 +174,12 @@ rm -f "$SCRIPT_HOME/.motd_shown"
 rm -f "$SCRIPT_HOME/.sudo_as_admin_successful"
 rm -rf "$SCRIPT_HOME/.cache/"
 
-# Set zsh as the default shell for the user by directly editing /etc/passwd
-sed -i -E "s|^($SCRIPT_USER:[^:]+:[0-9]+:[0-9]+:[^:]*:[^:]+):[^:]+|\1:/bin/zsh|" /etc/passwd
+# Set zsh as the default shell for the user
+chsh -s /bin/zsh "$SCRIPT_USER"
 
 # Apply dotfiles with stow as user
-sudo -u "$SCRIPT_USER" bash <<EOF
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME zsh
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME bash
 stow -v --dir=$SCRIPT_HOME/.dotfiles --target=$SCRIPT_HOME git
