@@ -86,6 +86,14 @@ mv ./rga-folder/*/rga-preproc /usr/local/bin
 rm -rf ./rga-folder/
 rm rga.tar.gz
 
+# install dezoomify-rs latest
+cd "$WORKDIR"
+wget -qO dezoomify-rs.tgz https://github.com/lovasoa/dezoomify-rs/releases/latest/download/dezoomify-rs-linux.tgz
+mkdir -p dezoomify-temp
+tar xzf dezoomify-rs.tgz -C ./dezoomify-temp
+mv ./dezoomify-temp/dezoomify-rs /usr/local/bin
+rm -rf dezoomify-temp dezoomify-rs.tgz
+
 # install gomi system-wide (installer drops the binary directly into PREFIX)
 curl -fsSL https://gomi.dev/install | PREFIX=/usr/local/bin bash
 
