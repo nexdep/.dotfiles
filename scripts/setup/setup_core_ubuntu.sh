@@ -48,7 +48,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 source "$SCRIPT_HOME/.nvm/nvm.sh"
 nvm install --lts
 nvm alias default lts/*
-npm install -g tree-sitter-cli
 npm install -g @bitwarden/cli
 EOF
 
@@ -117,6 +116,14 @@ LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/re
 curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
 tar xzvf lazygit.tar.gz lazygit
 install lazygit -D -t /usr/local/bin/
+
+# install Rust and tree-sitter-cli as user
+sudo -H -u "$SCRIPT_USER" bash <<EOF
+set -e
+curl https://sh.rustup.rs -sSf | sh -s -- -y
+. "$SCRIPT_HOME/.cargo/env"
+cargo install tree-sitter-cli
+EOF
 
 # install fzf from github
 cd "$WORKDIR"
