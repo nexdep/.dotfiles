@@ -186,6 +186,40 @@ scroll() {
 }
 # function to send the tmux scrollback to neovim >> end
 
+# bitwarden helpers >> start
+_bw_status_value() {
+  bw status 2>/dev/null | sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+}
+
+_bw_have_session() {
+  [[ -n "${BW_SESSION:-}" ]] && bw unlock --check --session "$BW_SESSION" >/dev/null 2>&1
+}
+
+_bw_export_session_from() {
+  local action="$1"
+  local s=""
+
+  case "$action" in
+    login)
+      s="$(bw login --raw)" || return 1
+      ;;
+    unlock)
+      s="$(bw unlock --raw)" || return 1
+      ;;
+    *)
+      echo "Unknown Bitwarden session action: $action"
+      return 1
+      ;;
+  esac
+
+  if [[ -z "$s" ]]; then
+    echo "Bitwarden did not return a session key."
+    return 1
+  fi
+
+  export BW_SESSION="$s"
+}
+
 # function to fetch ssh keys >> start
 bw_fetch_ssh() {
   local REF="$1"
@@ -198,9 +232,17 @@ bw_fetch_ssh() {
   local SSH_CONFIG="$HOME/.ssh/config"
   mkdir -p "$DEST_DIR" && chmod 700 "$DEST_DIR" || return 1
 
-  if [[ -z "$BW_SESSION" ]] || ! bw sync >/dev/null 2>&1; then
-    export BW_SESSION="$(bw unlock --raw)" || return 1
+  if ! _bw_have_session; then
+    [[ -n "${BW_SESSION:-}" ]] && unset BW_SESSION
+    bw_login || return 1
   fi
+
+  if ! _bw_have_session; then
+    echo "No valid Bitwarden session available. Run bw_login in an interactive shell."
+    return 1
+  fi
+
+  bw sync --session "$BW_SESSION" >/dev/null 2>&1 || echo "Warning: bw sync failed; continuing with cached vault data."
 
   local ITEM_ID=""
   local RESOLVED_NAME="$REF"
@@ -208,7 +250,7 @@ bw_fetch_ssh() {
 
   _bw_find_exact_item_id() {
     local name="$1"
-    bw list items --search "$name" \
+    bw list items --search "$name" --session "$BW_SESSION" \
       | jq -r --arg n "$name" '.[] | select(.name == $n) | .id' \
       | head -n 1
   }
@@ -216,12 +258,12 @@ bw_fetch_ssh() {
   _bw_get_private_key() {
     local item_id="$1"
     local pk=""
-    pk="$(bw get item "$item_id" | jq -r '.sshKey.privateKey // empty')" || pk=""
+    pk="$(bw get item "$item_id" --session "$BW_SESSION" | jq -r '.sshKey.privateKey // empty')" || pk=""
     if [[ -z "$pk" ]]; then
       local att_name
-      att_name="$(bw get item "$item_id" | jq -r '.attachments[0].fileName // empty')" || att_name=""
+      att_name="$(bw get item "$item_id" --session "$BW_SESSION" | jq -r '.attachments[0].fileName // empty')" || att_name=""
       if [[ -n "$att_name" ]]; then
-        pk="$(bw get attachment "$att_name" --itemid "$item_id" --output - 2>/dev/null)"
+        pk="$(bw get attachment "$att_name" --itemid "$item_id" --output - --session "$BW_SESSION" 2>/dev/null)"
       fi
     fi
     printf '%s' "$pk"
@@ -289,7 +331,7 @@ bw_fetch_ssh() {
   fi
 
   local RAW_NAME BASENAME
-  RAW_NAME="$(bw get item "$ITEM_ID" | jq -r '.name // "bitwarden_key"')" || return 1
+  RAW_NAME="$(bw get item "$ITEM_ID" --session "$BW_SESSION" | jq -r '.name // "bitwarden_key"')" || return 1
   BASENAME="${RAW_NAME// /_}"
   BASENAME="${BASENAME//[^A-Za-z0-9._-]/_}"
   [[ -z "$BASENAME" ]] && BASENAME="bitwarden_key"
@@ -327,9 +369,14 @@ bw_login() {
     no_relock=1
   fi
 
+  if ! command -v bw >/dev/null 2>&1; then
+    echo "Could not find the Bitwarden CLI (bw) on PATH."
+    return 1
+  fi
+
   # Get status string from bw status JSON (no jq required)
   local st
-  st="$(bw status 2>/dev/null | sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  st="$(_bw_status_value)"
 
   if [ -z "$st" ]; then
     echo "Could not read bw status. Is the Bitwarden CLI installed and on PATH?"
@@ -339,26 +386,23 @@ bw_login() {
   case "$st" in
     unauthenticated)
       # login and capture session key
-      local s
-      s="$(bw login --raw)" || return 1
-      export BW_SESSION="$s"
+      _bw_export_session_from login || return 1
       echo "BW_SESSION exported (login)."
       ;;
 
     locked)
       # unlock and capture session key
-      local s
-      s="$(bw unlock --raw)" || return 1
-      export BW_SESSION="$s"
+      _bw_export_session_from unlock || return 1
       echo "BW_SESSION exported (unlock)."
       ;;
 
     unlocked)
       # if already have a session in env, we're good
-      if [ -n "${BW_SESSION:-}" ]; then
+      if _bw_have_session; then
         echo "Vault is unlocked; BW_SESSION already set."
         return 0
       fi
+      [[ -n "${BW_SESSION:-}" ]] && unset BW_SESSION
 
       # Otherwise, BW doesn't provide a way to retrieve it from the unlocked state reliably.
       if [ $no_relock -eq 1 ]; then
@@ -368,9 +412,7 @@ bw_login() {
 
       # Force a fresh session key
       bw lock >/dev/null 2>&1
-      local s
-      s="$(bw unlock --raw)" || return 1
-      export BW_SESSION="$s"
+      _bw_export_session_from unlock || return 1
       echo "BW_SESSION exported (forced lock+unlock)."
       ;;
 
@@ -381,6 +423,7 @@ bw_login() {
   esac
 }
 # function to login or  unlock bitwarden and store the session <<< end
+# bitwarden helpers << end
 
 
 # function to print the path in a sorted manner >> start
@@ -546,4 +589,3 @@ if [[ -z "$TMUX" \
    && -z "$NVIM" ]]; then
   tmux attach-session -t main || tmux new-session -s main
 fi
-
