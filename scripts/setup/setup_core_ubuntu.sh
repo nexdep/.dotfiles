@@ -27,7 +27,11 @@ exec > >(tee -a "$LOG_FILE") 2>&1
 
 # Temporary directory for downloads, so failures don't leave root-owned files in $SCRIPT_HOME
 WORKDIR=$(mktemp -d)
-trap 'rm -rf "$WORKDIR"' EXIT
+
+# hold firefox to avoid downgrades
+FIREFOX_WAS_HELD=$(apt-mark showhold | grep -Fx firefox || true)
+apt-mark hold firefox || true
+trap '[ -n "$FIREFOX_WAS_HELD" ] || apt-mark unhold firefox >/dev/null 2>&1 || true; rm -rf "$WORKDIR"' EXIT
 
 # Update and upgrade the system
 export DEBIAN_FRONTEND=noninteractive
@@ -66,6 +70,7 @@ EOF
 apt-get -y install tmux
 apt-get -y install jq poppler-utils chafa liblua5.1-0-dev python3-venv gpg
 apt-get -y install btop vim-gtk3 libfuse2t64
+apt-get -y install --no-install-recommends libclang-common-21-dev
 apt-get -y install openssh-server
 apt-get -y install imagemagick
 apt-get -y install bubblewrap
@@ -128,7 +133,7 @@ EOF
 # install fzf from github
 cd "$WORKDIR"
 git clone --depth 1 https://github.com/junegunn/fzf.git "$WORKDIR/fzf"
-"$WORKDIR/fzf/install" --bin
+PATH=/usr/bin:/bin "$WORKDIR/fzf/install" --bin
 mv "$WORKDIR/fzf/bin/"* /usr/local/bin
 
 # install claude code as user
