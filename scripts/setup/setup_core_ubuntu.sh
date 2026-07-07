@@ -68,6 +68,7 @@ apt-get -y install tmux
 apt-get -y install jq poppler-utils chafa liblua5.1-0-dev python3-venv gpg
 apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install openssh-server
+apt-get -y install imagemagick
 apt-get -y install bubblewrap
 apt-get -y install git-lfs
 apt-get -y install gnupg rng-tools
@@ -116,12 +117,6 @@ LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/re
 curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
 tar xzvf lazygit.tar.gz lazygit
 install lazygit -D -t /usr/local/bin/
-
-# install imagemagick binary from its website
-cd "$WORKDIR"
-wget -O magick https://imagemagick.org/archive/binaries/magick
-chmod +x magick
-mv magick /usr/local/bin
 
 # install fzf from github
 cd "$WORKDIR"
