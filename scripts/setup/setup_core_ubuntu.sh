@@ -139,7 +139,7 @@ mv "$WORKDIR/fzf/bin/"* /usr/local/bin
 # install claude code as user
 sudo -H -u "$SCRIPT_USER" bash <<EOF
 set -e
-curl -fsSL https://claude.ai/install.sh | sh
+curl -fsSL https://claude.ai/install.sh | bash
 EOF
 
 # install codex as user

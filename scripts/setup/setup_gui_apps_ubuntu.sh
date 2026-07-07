@@ -116,9 +116,9 @@ EOF
 }
 
 install_apt_apps() {
-  echo "Installing WezTerm, Visual Studio Code Insiders, Firefox Developer Edition, and ParaView..."
+  echo "Installing WezTerm Nightly, Visual Studio Code Insiders, Firefox Developer Edition, and ParaView..."
   sudo apt-get update
-  sudo apt-get install -y wezterm code-insiders firefox-devedition paraview
+  sudo apt-get install -y wezterm-nightly code-insiders firefox-devedition paraview
 }
 
 install_obsidian_flatpak() {
@@ -273,7 +273,7 @@ main() {
 
   echo
   echo "Done. Installed apps:"
-  echo "  - wezterm"
+  echo "  - wezterm-nightly"
   echo "  - code-insiders"
   echo "  - firefox-devedition"
   echo "  - thunderbird-beta"
