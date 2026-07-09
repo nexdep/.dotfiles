@@ -14,15 +14,6 @@ let &t_SI.="\e[2 q" "SI = INSERT mode
 let &t_SR.="\e[4 q" "SR = REPLACE mode
 let &t_EI.="\e[2 q" "EI = NORMAL mode (ELSE)
 
-"Cursor settings:
-"  1 -> blinking block
-"  2 -> solid block 
-"  3 -> blinking underscore
-"  4 -> solid underscore
-"  5 -> blinking vertical bar
-"  6 -> solid vertical bar
-
-
 "silence the vim bell
 set noerrorbells
 set visualbell
@@ -40,38 +31,3 @@ augroup QuickNotes
   au BufWinEnter ?*.py silent loadview
 augroup END
 
-
-" F3 key mapping for results redirect  
-" https://vim.fandom.com/wiki/Redirect_g_search_output
-nnoremap <silent> <F3> :redir @a<CR>:g//<CR>:redir END<CR>:new<CR>:put! a<CR>
-
-" F9 remap for running python code while editing
-autocmd FileType python map <buffer> <F9> :w<CR>:exec '!python3' shellescape(@%, 1)<CR>
-autocmd FileType python imap <buffer> <F9> <esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
-
-" set a light grey bar on the 80th column
-"highlight ColorColumn ctermbg=grey guibg=grey  
-"set cc=80
-
-
-"remap to avoid arrows!
-inoremap <C-h> <Left>
-inoremap <C-j> <Down>
-inoremap <C-k> <Up>
-inoremap <C-l> <Right>
-cnoremap <C-h> <Left>
-cnoremap <C-j> <Down>
-cnoremap <C-k> <Up>
-cnoremap <C-l> <Right>
-noremap <Up> <Nop>
-noremap <Down> <Nop>
-noremap <Left> <Nop>
-noremap <Right> <Nop>
-inoremap <Up> <Nop>
-inoremap <Down> <Nop>
-inoremap <Left> <Nop>
-inoremap <Right> <Nop>
-cnoremap <Up> <Nop>
-cnoremap <Down> <Nop>
-cnoremap <Left> <Nop>
-cnoremap <Right> <Nop>
