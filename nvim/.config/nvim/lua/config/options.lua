@@ -19,5 +19,17 @@ if vim.fn.has("wsl") == 1 then
   }
 end
 
--- set line length marker at 100 characters
-vim.opt.textwidth = 100
+-- conceal labels in LaTeX documents
+vim.g.vimtex_syntax_conceal = {
+  labels = 1,
+
+  refs = 0,
+  cites = 0,
+  math_bounds = 0,
+  math_delimiters = 0,
+  math_fracs = 0,
+  math_super_sub = 0,
+  math_symbols = 0,
+  sections = 0,
+  styles = 0,
+}
