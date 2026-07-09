@@ -72,7 +72,7 @@ apt-get -y install jq poppler-utils chafa liblua5.1-0-dev python3-venv gpg
 apt-get -y install btop vim-gtk3 libfuse2t64
 apt-get -y install --no-install-recommends libclang-common-21-dev
 apt-get -y install openssh-server
-apt-get -y install latexmk texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra biber  zathura zathura-pdf-poppler
+apt-get -y install latexmk texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra biber texlive-extra-utils  zathura zathura-pdf-poppler # latex stuff
 apt-get -y install imagemagick
 apt-get -y install bubblewrap
 apt-get -y install git-lfs
