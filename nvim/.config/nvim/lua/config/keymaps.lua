@@ -91,31 +91,3 @@ vim.keymap.set("n", "<leader>xy", function()
   vim.notify("Copied line + diagnostics to clipboard", vim.log.levels.INFO)
 end, { desc = "Copy current line + diagnostics to clipboard" })
 
--- ~/.config/nvim/lua/config/keymaps.lua
-
--- Replace LazyVim's default <leader>us = Toggle Spelling
-pcall(vim.keymap.del, "n", "<leader>us")
-
-local function harper_clients(bufnr)
-  return vim.lsp.get_clients({
-    bufnr = bufnr,
-    name = "harper_ls",
-  })
-end
-
-vim.keymap.set("n", "<leader>us", function()
-  local bufnr = vim.api.nvim_get_current_buf()
-  local clients = harper_clients(bufnr)
-
-  if #clients > 0 then
-    for _, client in ipairs(clients) do
-      vim.lsp.stop_client(client.id)
-    end
-    vim.b[bufnr].harper_ls_disabled = true
-    vim.notify("Harper off", vim.log.levels.INFO)
-  else
-    vim.b[bufnr].harper_ls_disabled = false
-    vim.cmd("LspStart harper_ls")
-    vim.notify("Harper on", vim.log.levels.INFO)
-  end
-end, { desc = "Toggle Harper" })
