@@ -12,3 +12,7 @@ secring.gpg
 !gpg/ownertrust.txt
 !gpg/install.sh
 !gpg/README.md
+
+# nvim log
+.nvimlog
+
