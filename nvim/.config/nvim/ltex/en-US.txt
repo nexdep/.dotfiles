@@ -7,6 +7,8 @@ PFM
 neutronics
 fluned
 radwaste
+multigroup
+Eq
 thermo-fluid
 acticircuitpy
 OpenMC

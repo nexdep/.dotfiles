@@ -44,17 +44,6 @@ apt-get autoclean -y
 # Install basic packages
 apt-get -y install gcc stow zsh curl p7zip build-essential software-properties-common unzip wget
 
-# install node and npm
-sudo -H -u "$SCRIPT_USER" bash <<EOF
-set -e
-cd "$SCRIPT_HOME"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-source "$SCRIPT_HOME/.nvm/nvm.sh"
-nvm install --lts
-nvm alias default lts/*
-npm install -g @bitwarden/cli
-EOF
-
 # install gh cli
 (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
   sudo mkdir -p -m 755 /etc/apt/keyrings &&

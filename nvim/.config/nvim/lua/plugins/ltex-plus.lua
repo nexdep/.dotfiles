@@ -45,6 +45,12 @@ return {
               diagnosticSeverity = "information",
               completionEnabled = false,
 
+              latex = {
+                commands = {
+                  ["\\texttt{}"] = "dummy",
+                },
+              },
+
               dictionary = {
                 ["en-US"] = {},
               },

@@ -7,9 +7,7 @@ tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 
 {
-  printf 'OPENROUTER_API_KEY='
-  gopass show api/marco-openrouter-key-1 | head -n1
-  printf '\n'
+  printf 'OPENROUTER_API_KEY=%s\n' "$(gopass show --password api/marco-openrouter-key-1)"
 } >"$tmp"
 
 install -m 600 "$tmp" "$HOME/.hermes/.env"
