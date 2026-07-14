@@ -48,6 +48,8 @@ return {
               latex = {
                 commands = {
                   ["\\texttt{}"] = "dummy",
+                  ["\\refeq{}"] = "dummy",
+                  ["\\newacro{}"] = "dummy",
                 },
               },
 

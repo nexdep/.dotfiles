@@ -2,6 +2,10 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+-- Keep formatting manual for every filetype. LazyVim's manual format command
+-- uses `force = true`, so `<leader>cf` continues to work.
+vim.g.autoformat = false
+
 -- Enable Windows clipboard when running in WSL
 
 if vim.fn.has("wsl") == 1 then
