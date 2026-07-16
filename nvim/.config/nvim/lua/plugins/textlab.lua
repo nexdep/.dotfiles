@@ -2,6 +2,9 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = {
+      inlay_hints = {
+        exclude = { "vue", "tex", "plaintex" },
+      },
       servers = {
         texlab = {
           settings = {
@@ -10,6 +13,9 @@ return {
                 ignoredPatterns = {
                   "Unused label",
                 },
+              },
+              inlayHints = {
+                labelReferences = false,
               },
             },
           },
