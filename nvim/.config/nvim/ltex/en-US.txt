@@ -1,3 +1,7 @@
+Eq
+thermo-fluid
+Precomputation
+precomputation
 acticircuitpy
 Neutronics
 FLUNED
@@ -12,6 +16,3 @@ FLiBe
 neutronics
 radwaste
 multigroup
-Eq
-thermo-fluid
-Precomputation
