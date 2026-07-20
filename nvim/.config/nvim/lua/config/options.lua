@@ -6,6 +6,9 @@
 -- uses `force = true`, so `<leader>cf` continues to work.
 vim.g.autoformat = false
 
+-- Keep long lines on a single screen line and scroll horizontally instead.
+vim.opt.wrap = false
+
 -- Enable Windows clipboard when running in WSL
 
 if vim.fn.has("wsl") == 1 then
