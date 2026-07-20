@@ -29,6 +29,7 @@ vim.g.vimtex_syntax_conceal = {
 
   refs = 0,
   cites = 0,
+  spacing = 0, -- Keep commands such as \vspace and \hfill visible.
   math_bounds = 0,
   math_delimiters = 0,
   math_fracs = 0,
